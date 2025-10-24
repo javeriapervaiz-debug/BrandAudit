@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buffer - Social Media Management for Everyone</title>
+    <style>
+        /* Buffer-inspired styles with intentional violations */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif; /* VIOLATION: Should be Roboto */
+            background-color: #ffffff;
+            color: #333333; /* VIOLATION: Should be #0A0A0A (Buffer Black) */
+            line-height: 1.6;
+        }
+        
+        .header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e1e5e9;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            height: 70px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #5c8ac0; /* VIOLATION: Should be #5c8ac0 but using different shade */
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+        
+        .nav-links a {
+            color: #333333;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: #5c8ac0;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: #5c8ac0; /* VIOLATION: Should be #0FA3B1 (Ocean) */
+            border: 2px solid #5c8ac0; /* VIOLATION: Should be #0FA3B1 (Ocean) */
+        }
+        
+        .btn-primary {
+            background-color: #d85629; /* VIOLATION: Should be #F75C03 (Coral) */
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background-color: #c44a1f;
+        }
+        
+        .main-content {
+            margin-top: 70px;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #333333;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+        
+        .hero h2 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #666666;
+            margin-bottom: 32px;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            color: #666666;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 60px;
+        }
+        
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 18px;
+        }
+        
+        .features {
+            padding: 100px 0;
+            background-color: #ffffff;
+        }
+        
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .features h2 {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+            color: #333333;
+        }
+        
+        .features p {
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 60px;
+            color: #666666;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333333;
+        }
+        
+        .feature-card p {
+            font-size: 16px;
+            color: #666666;
+            margin-bottom: 24px;
+        }
+        
+        .feature-card .btn {
+            font-size: 16px;
+            padding: 12px 24px;
+        }
+        
+        .stats {
+            background-color: #f8f9fa;
+            padding: 80px 0;
+        }
+        
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        
+        .stats h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #333333;
+        }
+        
+        .stats p {
+            font-size: 18px;
+            color: #666666;
+            margin-bottom: 60px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #5c8ac0;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: #666666;
+        }
+        
+        .testimonials {
+            padding: 100px 0;
+            background-color: #ffffff;
+        }
+        
+        .testimonials-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .testimonials h2 {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+            color: #333333;
+        }
+        
+        .testimonials p {
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 60px;
+            color: #666666;
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .testimonial-card {
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .testimonial-card p {
+            font-size: 16px;
+            color: #333333;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            font-size: 14px;
+            color: #666666;
+            font-weight: 600;
+        }
+        
+        .footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 60px 0 40px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+        
+        .footer-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-section ul li a {
+            color: #cccccc;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .footer-section ul li a:hover {
+            color: #ffffff;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #555555;
+            margin-top: 40px;
+            padding-top: 20px;
+            text-align: center;
+            color: #cccccc;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDBDNy4xNjMgMCAwIDcuMTYzIDAgMTZTMi4xNjMgMzIgMTYgMzJTMzIgMjQuODM3IDMyIDE2UzI0LjgzNyAwIDE2IDBaIiBmaWxsPSIjNWM4YWMwIi8+CjxwYXRoIGQ9Ik0xNiA4QzEwLjQ3NyA4IDYgMTIuNDc3IDYgMThTMTIuNDc3IDI4IDE2IDI4UzI2IDIzLjUyMyAyNiAxOFMyMjAuNTIzIDggMTYgOFoiIGZpbGw9IiNmZmZmZmYiLz4KPC9zdmc+" alt="Buffer Logo">
+                <span class="logo-text">Buffer</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#publish">Publish</a></li>
+                    <li><a href="#create">Create</a></li>
+                    <li><a href="#collaborate">Collaborate</a></li>
+                    <li><a href="#engage">Engage</a></li>
+                    <li><a href="#analyze">Analyze</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                </ul>
+            </nav>
+            
+            <div class="auth-buttons">
+                <a href="#login" class="btn btn-secondary">Log in</a>
+                <a href="#signup" class="btn btn-primary">Get started free</a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-container">
+                <h1>Buffer</h1>
+                <h2>Your social media workspace</h2>
+                <p>Buffer is trusted by over 100,000 businesses and individuals to help them grow their social media presence with confidence.</p>
+                
+                <div class="cta-buttons">
+                    <a href="#signup" class="btn btn-primary btn-large">Get started free</a>
+                    <a href="#demo" class="btn btn-secondary btn-large">Watch demo</a>
+                </div>
+            </div>
+        </section>
+        
+        <section class="features">
+            <div class="features-container">
+                <h2>Everything you need to succeed on social media</h2>
+                <p>Publish, create, collaborate, engage, and analyze all in one place</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>Publish</h3>
+                        <p>The most complete set of publishing integrations, ever. Schedule posts across all your social media accounts.</p>
+                        <a href="#publish" class="btn btn-primary">Learn more</a>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Create</h3>
+                        <p>Turn any idea into the perfect post with our AI-powered content creation tools.</p>
+                        <a href="#create" class="btn btn-primary">Learn more</a>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Collaborate</h3>
+                        <p>Great content, created together. Work with your team to create amazing social media content.</p>
+                        <a href="#collaborate" class="btn btn-primary">Learn more</a>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Engage</h3>
+                        <p>Reply to comments in a flash. Never miss an opportunity to connect with your audience.</p>
+                        <a href="#engage" class="btn btn-primary">Learn more</a>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Analyze</h3>
+                        <p>Answers, not just analytics. Get insights that help you grow your social media presence.</p>
+                        <a href="#analyze" class="btn btn-primary">Learn more</a>
+                    </div>
+                    <div class="feature-card">
+                        <h3>Connect</h3>
+                        <p>Connect your favorite accounts and start publishing in minutes. No technical setup required.</p>
+                        <a href="#connect" class="btn btn-primary">Learn more</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="stats">
+            <div class="stats-container">
+                <h2>Trusted by millions worldwide</h2>
+                <p>Join the community of successful social media managers</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">100K+</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">2M+</div>
+                        <div class="stat-label">Posts Published</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Integrations</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="testimonials">
+            <div class="testimonials-container">
+                <h2>What our customers say</h2>
+                <p>Don't just take our word for it</p>
+                
+                <div class="testimonial-grid">
+                    <div class="testimonial-card">
+                        <p>"Buffer has completely transformed how we manage our social media. The scheduling feature alone saves us hours every week."</p>
+                        <div class="testimonial-author">- Sarah Johnson, Marketing Director</div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"The analytics are incredible. We can finally see what's working and what's not. Our engagement has increased by 300%."</p>
+                        <div class="testimonial-author">- Mike Chen, Social Media Manager</div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p>"Buffer makes it so easy to collaborate with our team. Everyone can contribute to our social media strategy."</p>
+                        <div class="testimonial-author">- Emily Rodriguez, Content Creator</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#publish">Publish</a></li>
+                    <li><a href="#create">Create</a></li>
+                    <li><a href="#collaborate">Collaborate</a></li>
+                    <li><a href="#engage">Engage</a></li>
+                    <li><a href="#analyze">Analyze</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="#blog">Blog</a></li>
+                    <li><a href="#help">Help Center</a></li>
+                    <li><a href="#guides">Guides</a></li>
+                    <li><a href="#webinars">Webinars</a></li>
+                    <li><a href="#podcast">Podcast</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#careers">Careers</a></li>
+                    <li><a href="#press">Press</a></li>
+                    <li><a href="#transparency">Transparency</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#help">Help Center</a></li>
+                    <li><a href="#community">Community</a></li>
+                    <li><a href="#status">Status</a></li>
+                    <li><a href="#security">Security</a></li>
+                    <li><a href="#privacy">Privacy</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 Buffer, Inc. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

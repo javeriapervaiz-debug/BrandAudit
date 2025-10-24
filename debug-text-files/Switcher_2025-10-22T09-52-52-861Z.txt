@@ -1,0 +1,350 @@
+ï»¿where your
+video lives
+
+BRAND GUIDELINES 2024
+
+Switcher Brand Guidelines 1brand guidelines
+
+These guidelines were developed to define and inform Switcherâs
+brand â how we look, sound, and feel to our audience. This
+document outlines usage for our logos, typefaces, color palettes,
+icons, patterns, and so on. It also includes key positioning that
+informs how we communicate with our audience.
+
+Why are brand guidelines necessary?
+From our proprietary logos to the words we choose, each of these guidelines comprises one piece of our full brand
+identity. Adhering to guidelines helps preserve our visual identity, build recognition, protect our logo assets, and craft
+powerful and resonant messaging across channels.
+
+Need approved fonts, logos, graphic elements, or additional information?
+Contact: Chelsea Grider
+Senior Visual Designer  |  Switcher Studio
+Email: chelsea@switcherstudio.com
+
+Switcher Brand Guidelines 2table of Introduction 4
+Our Logo 9
+contents Icon System 15
+Brand Typeface 17
+Color Usage 21
+Brand Visuals 24
+
+Switcher Brand Guidelines 3introductionpositioning statement
+
+Switcher Brand Guidelines 5brand voice
+Switcher's voice is direct, confident, encouraging, and upbeat.
+
+Our voice can be heard in everything we create (even when words arenât involved).
+It informs who we are and how we present ourselves to the world.
+Direct We exist in a competitive landscape. We donât want to waste anyoneâs time or energy, so we
+streamline messaging and remove complexity. No BS, no fluff, no jargon: We create simple
+and accessible solutions, so we write simple and accessible content.
+Confident We may be a startup, but weâre not just starting â we know our stuff. We believe
+in our product and the limitless potential of our users, but we donât bluster: Our
+messaging has a laid-back conviction.
+Encouraging Weâre not just empowering our users by providing the tools they need to
+succeed â weâre also their biggest cheerleaders. We invite our audience
+to dream big with us, because we win when our customers win.
+
+Upbeat Weâre innovative, nimble, and forward-thinking. We refuse to stagnate â weâre continually
+growing and evolving alongside our users. We stay energetic, enthusiastic, and a little bit
+playful (because video should be fun, even when itâs your business).
+
+Switcher Brand Guidelines 6brand personality
+Switcherâs brand personality is competent and creative
+
+Identity: Innovative
+Language: Sincere, accessible
+Voice: Direct, confident, encouraging, upbeat
+Motivation: Greatness, connection
+Fear: Stagnation, disengagement
+
+Characteristics: Genuine, imaginative, positive, open-minded
+
+Switcher Brand Guidelines 7brand basics
+The âwho we areâ and âwhy weâre here.â Our core principles â purpose, mission, vision, and values
+
+Why does Switcher exist?
+Switcher is reinventing the business of video â empowering users to create without limitations, connect
+meaningfully with audiences, skip the lines, and unlock earnings.
+What does our future look like?
+Our vision: to become the video commerce platform of choice for small businesses and teams.
+How will we create that future?
+We are working with customers to build a next-generation framework that solves for every step of the video
+commerce process.
+What principles guide our behaviors?
+Our core values guide everything we do. Weâre committed to building something great â through empathy,
+transparency, honesty, and curiosity.
+Who is our target customer?
+Individuals, teams, and businesses seeking to maximize their reach, creative potential, and revenue using video.
+Our target audience is interested in video creation, hosting, and monetization.
+What makes Switcher different?
+What is unique about Switcher in our competitive landscape? Weâre streamlined, unified, and simplified. We
+donât just make products â we engineer workflows that make success in video achievable. Weâre lowering
+barriers to entry. We believe in skipping lines and removing roadblocks, so success is faster and easier.our logoprimary logotypes
+
+These are the go-to logos for all brand communications. It's a trademark to help viewers easily identify the Switcher
+brand. It is essential that the logo is always applied with care and respect.
+
+Alternative Lockups
+The Switcher brand also has a typographic-only mark (1) and an icon mark (2). These are to be used particularly in
+situations where legibility at small screen sizes becomes an issue. The Switcher information lockup (3) should be
+standard when information needs to be listed on any type of form, email, or printed piece.
+
+SWITCHER
+
+1205 East Washington Street, Suite 117
+Louisville, Kentucky 40206
+switcherstudio.com
+
+Switcher Brand Guidelines 10alternate logotypes
+
+When using the Switcher logo on dark backgrounds, simply inverse the logo to a complete white. When color cannot
+be used, simplify the mark by using all black.
+
+Black Versions
+
+White Versions
+
+Switcher Brand Guidelines 11clear space
+
+To ensure the prominence and legibility of the logo, always surround it with a field of clear space. Clear space isolates
+the logo from competing graphic elements such as text or photography that may divert attention from the logo. This
+area is measured using the height of the capital S in the logo, as shown. No other graphic elements, typography, rules,
+or images should appear inside this clear space.
+
+Minimum Size
+
+Minimum size refers to the smallest dimensions allowed for the Switcher logo. The minimum sizes for each
+configuration of the logo are listed below.
+
+For print: 0.75" minimum
+For web: 60 pixel minimum
+For print: 1" minimum
+For web: 100 pixel minimum
+For print: 0.25" minimum
+For web: 30 pixel minimum
+
+Switcher Brand Guidelines 12correct logo usage
+
+The logo can be placed on a background with one of the colors from the primary or secondary color palette, as well as
+white, black, or gray. Here are examples of the logo applied in these instances.
+
+The logo can also be placed on images, but there must be enough contrast between the image and logo for
+acceptable readability. In most instances, the logotype should be used in white when placed on imagery except
+when the background is bright enough for the type to be rendered in color.
+
+Switcher Brand Guidelines 13incorrect logo usage
+
+The Switcher logo should not be adjusted or edited in any way. Here are some examples of what not to do:
+1. Don't change the colors of the logo. 6. Don't place the logo on top of an image with poor
+2. Don't place elements in the logo clear space. contrast and readability.
+3. Don't condense, expand, or distort the logo 7. Don't resize any individual elements of the logo.
+disproportionately. 8. Don't rotate the logo.
+4. Don't add a drop shadow, bevel and emboss, inner 9. Don't crop the logo.
+glow, or any other text effects to the logo. 10. Don't remove the background from the icon mark.
+5. Don't adjust the placement of the logo icon.
+
+1 5 9
+
+2 6 10
+
+3 7
+
+4 8
+
+Switcher Brand Guidelines 14icon systemiconography
+
+Our icons were originally created to represent menu items within the Switcher Studio app, and for use on
+switcherstudio.com. These icons may never substitute the main logo, but may be used across the entire brand.
+Incorporating icons into layouts is a great way to break up large portions of text and images. They also make
+content more visual and easily digestible. Switcher icons are made with light line strokes and can be created in
+any brand color other than black.
+
+Create an icon in a 40 x 40 bounding box with a 2-pt stroke weight. Some icons may be taller or wider, but the
+scale should feel comparable. Once made, the strokes should be outlined before scaling up or down in size.
+
+Note: Do not edit any individual element of the icons.
+
+Switcher Brand Guidelines 16brand typefaceprimary typeface
+
+Consistent use of typography helps to make the brand identity strong and cohesive across all applications.
+The typeface Omnes was selected to complement the voice and tone of Switcher's brand. This typeface is a
+websafe font with flexibility built in â there are a range of styles within the font family.
+
+Omnes
+Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Our primary typeface, Omnes, comes in
+nine weights from Hairline to Black. We
+most commonly use Regular, Medium,
+Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu and Semibold. ExtraLight and Bold
+should be left for special instances.
+Vv Ww Xx Yy Zz 0123456789 Omnes includes a full set of italics that
+can be (tastefully) used to add emphasis.
+Do not set in all-caps.
+
+Hairline
+Hairline Italic
+Thin
+Thin Italic
+ExtraLight
+ExtraLight Italic
+Light
+Light Italic
+Regular
+Italic
+Medium
+Medium Italic
+SemiBold
+SemiBold Italic
+Bold
+Bold Italic
+Black
+Black Italic
+
+Switcher Brand Guidelines 18primary typeface
+
+Consistent use of typography helps to make the brand identity strong and cohesive across all applications.
+The typeface Montserrat was selected to complement the voice and tone of Switcher's brand. This typeface
+is a websafe font with flexibility built in â there are a range of styles within the font family. Montserrat is a
+supporting font to Omnes, acting as the body copy or alternate subhead styles.
+Montserrat
+Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Our primary typeface, Montserrat, comes
+in eight weights from ExtraLight to Black.
+Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu We most commonly use Light, Regular,
+Medium, Semibold, and Bold. Montserrat
+includes a full set of italics that can
+Vv Ww Xx Yy Zz 0123456789 be (tastefully) used to add emphasis.
+Montserrat can be set in all-caps.
+
+ExtraLight
+ExtraLight Italic
+Light
+Light Italic
+Regular
+Italic
+Medium
+Medium Italic
+SemiBold
+SemiBold Italic
+Bold
+Bold Italic
+ExtraBold
+ExtraBold Italic
+Black
+Black Italic
+
+Switcher Brand Guidelines 19secondary typefaces
+neighbor Neighbor is Switcher's secondary
+typeface. It can also be used sparingly
+to add fun to short (2â4 word) headlines
+Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll in all lowercase. It comes in two
+weights, Regular and Medium. We most
+commonly use Medium as seen in our
+Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv logo wordmark. It should not be set in
+caps, lowercase only.
+Ww Xx Yy Zz 0123456789 Regular Medium
+Italic Medium Italic
+greatest richmond Greatest Richmond is Switcher's
+secondary typeface. It can also be used
+sparingly to add fun to short one word in
+Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk headlines in all lowercase. It should not
+be set in caps, lowercase only.
+Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu
+Vv Ww Xx Yy Zz 0123456789
+
+Switcher Brand Guidelines 20color usagebrand color
+
+Core Palette
+Our core colors are how we
+express ourselves in the most
+direct, Switcher way possible.
+switcher orange
+PMS Pantone 1655C
+CMYK 1 | 82 | 99 | 0
+RGB 237 | 86 | 35
+HEX #ED5623
+light orange
+CMYK 0 | 57 | 100 | 0
+RGB 225 | 136 | 0
+HEX #FF8800
+switcher blue
+CMYK 98 | 71 | 47 | 80
+RGB 0 | 58 | 80
+HEX #003A50
+cut to black
+CMYK 88 | 69 | 60 | 73
+RGB 0 | 26 | 35
+HEX #001A23
+
+Lean heavily on Switcher
+orange, but use secondary
+sets to build color schemes
+that are complementary and
+balanced. White, black, and
+gray are also allowed to be
+used in combination with
+these colors.
+
+Switcher Brand Guidelines 22brand color
+Secondary Palette CMYK   95 | 71 | 53 | 55 CMYK   0 | 4 | 5 | 0 CMYK   0 | 12 | 29 | 0 CMYK   8 | 49 | 100 | 0
+RGB      236 | 236 | 236 RGB      255 | 243 | 235 RGB      255 | 255 | 185 RGB      230 | 145 | 36
+Secondary colors are for HEX      #ECECEC HEX      #FFF3EB HEX      #FFE1B9 HEX      #E9B000
+when we activate turbo
+mode. Theyâre like our
+ultimate move. Our robust
+color palette provides lots
+of design options, but
+thoughtful consideration and
+restraint must be exercised to CMYK   25 | 0 | 13 | 0 CMYK   72 | 00 | 35 | 0 CMYK   80 | 3 | 75 | 0 CMYK   83 | 45 | 84 | 49
+RGB      185 | 240 | 231 RGB      19 | 187 | 182 RGB      9 | 174 | 115 RGB      30 | 72 | 46
+make sure we donât lose our HEX      #B9F0E7 HEX      #13BBB6 HEX      #09AE73 HEX      #1E482E
+visual identity.
+
+CMYK 01 | 69 | 52 | 0
+RGB 240 | 115 | 106
+HEX #F0736A
+CMYK 27 | 32 | 0 | 0
+RGB 191 | 171 | 255
+HEX #BFABFF
+CMYK 62 | 73 | 0 | 0
+RGB 145 | 70 | 255
+HEX #9146FF
+CMYK 87 | 53 | 05 | 00
+RGB 27 | 114 | 177
+HEX #1C71B1
+
+Switcher Brand Guidelines 23brand visualsgraphics pattern
+
+The Switcher icon pattern can be used on a variety of different collateral. The patterns can even be used with
+type or imagery placed on top.
+
+Switcher Gradients
+
+SWITCHER BLUE GRADIENT SWITCHER ORANGE GRADIENT
+
+#003A50 #001A23 #FF8800 #ED5623
+
+#FFF3EB #FFE1B9 #F0736A #E9B000 #9146FF #F0736A #1C71B1 #13BBB6 #09AE73 #1E482E #BFABFF #9146FF
+
+Switcher Brand Guidelines 25photography
+
+Photography helps carry Switcher's brand and voice. In general, photography should convey a feeling of authenticity
+to viewers. Avoid being too flashy or excessively staged. Use the camera and light with purpose.
+
+Candid Upbeat User-focused
+Candid images generally feel more Our images are energetic, enthusiastic, and a People using and interacting with our
+genuine than posed photos and should little bit playful (because video should be fun, product reflect Switcherâs user-first
+be the go-to style of imagery. even when itâs your business). mentality.
+
+Positive
+The energy should always be positive.
+Images with people smiling and looking
+content are preferred.
+In the moment
+Capture users in the moment, showing
+engagement and collaboration.
+Screenshots
+Real-life mockups of screenshots help
+showcase our product, new features, and
+releases.
+
+Switcher Brand Guidelines 26Â® switcher

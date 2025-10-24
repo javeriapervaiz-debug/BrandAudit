@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Guideline Manager</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f6f8fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #24292e;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #24292e;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5da;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            background: #0366d6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #0256cc;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .brands-list {
+            margin-top: 30px;
+        }
+        .brand-item {
+            background: #f6f8fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid #0366d6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Brand Guideline Manager</h1>
+        
+        <form id="brandForm">
+            <div class="form-group">
+                <label for="brandName">Brand Name *</label>
+                <input type="text" id="brandName" name="brandName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="companyName">Company Name</label>
+                <input type="text" id="companyName" name="companyName">
+            </div>
+            
+            <div class="form-group">
+                <label for="industry">Industry</label>
+                <select id="industry" name="industry">
+                    <option value="Technology">Technology</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Education">Education</option>
+                    <option value="Retail">Retail</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="primaryColor">Primary Color (Hex)</label>
+                <input type="text" id="primaryColor" name="primaryColor" placeholder="#0366d6">
+            </div>
+            
+            <div class="form-group">
+                <label for="primaryFont">Primary Font</label>
+                <input type="text" id="primaryFont" name="primaryFont" placeholder="SF Pro Text">
+            </div>
+            
+            <div class="form-group">
+                <label for="forbiddenColors">Forbidden Colors (comma-separated)</label>
+                <input type="text" id="forbiddenColors" name="forbiddenColors" placeholder="#ff0000, #00ff00">
+            </div>
+            
+            <button type="submit">Add Brand Guideline</button>
+        </form>
+        
+        <div id="message"></div>
+        
+        <div class="brands-list">
+            <h2>📋 Existing Brands</h2>
+            <button onclick="loadBrands()">Refresh List</button>
+            <div id="brandsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5173/api';
+        
+        document.getElementById('brandForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                brandName: formData.get('brandName'),
+                companyName: formData.get('companyName'),
+                industry: formData.get('industry'),
+                colors: {
+                    semantic: {
+                        primary: {
+                            hex: formData.get('primaryColor'),
+                            name: `${formData.get('brandName')} Primary`,
+                            usage: 'Primary actions and branding'
+                        }
+                    },
+                    forbidden: formData.get('forbiddenColors').split(',').map(c => c.trim()).filter(c => c)
+                },
+                typography: {
+                    fonts: {
+                        primary: formData.get('primaryFont'),
+                        fallback: 'sans-serif'
+                    }
+                }
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/brands`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage('✅ Brand guideline added successfully!', 'success');
+                    e.target.reset();
+                    loadBrands();
+                } else {
+                    showMessage(`❌ Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showMessage(`❌ Network error: ${error.message}`, 'error');
+            }
+        });
+        
+        async function loadBrands() {
+            try {
+                const response = await fetch(`${API_BASE}/brands`);
+                const result = await response.json();
+                
+                const brandsList = document.getElementById('brandsList');
+                
+                if (result.success && result.data.guidelines.length > 0) {
+                    brandsList.innerHTML = result.data.guidelines.map(brand => `
+                        <div class="brand-item">
+                            <h3>${brand.brandName}</h3>
+                            <p><strong>Company:</strong> ${brand.companyName || 'N/A'}</p>
+                            <p><strong>Industry:</strong> ${brand.industry || 'N/A'}</p>
+                            <p><strong>Primary Color:</strong> ${brand.colors?.semantic?.primary?.hex || 'N/A'}</p>
+                            <p><strong>Primary Font:</strong> ${brand.typography?.fonts?.primary || 'N/A'}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    brandsList.innerHTML = '<p>No brands found. Add your first brand above!</p>';
+                }
+            } catch (error) {
+                document.getElementById('brandsList').innerHTML = `<p class="error">Error loading brands: ${error.message}</p>`;
+            }
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}">${text}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Load brands on page load
+        loadBrands();
+    </script>
+</body>
+</html>
+

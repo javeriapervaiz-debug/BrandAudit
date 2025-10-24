@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub - Where the world builds software</title>
+    <style>
+        /* GitHub-inspired styles with intentional violations */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif; /* VIOLATION: Should be SF Pro Text */
+            background-color: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.5;
+        }
+        
+        .header {
+            background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 16px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .logo-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+        
+        .nav-links a {
+            color: #c9d1d9;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            color: #f0f6fc;
+        }
+        
+        .search-box {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #c9d1d9;
+            font-size: 14px;
+            width: 300px;
+        }
+        
+        .search-box::placeholder {
+            color: #7d8590;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+        }
+        
+        .btn-primary {
+            background-color: #238636; /* VIOLATION: Should be #0366d6 */
+            color: #ffffff;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2ea043;
+        }
+        
+        .main-content {
+            margin-top: 80px;
+            padding: 80px 0;
+        }
+        
+        .hero {
+            text-align: center;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #f0f6fc;
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            color: #7d8590;
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-bottom: 64px;
+        }
+        
+        .btn-large {
+            padding: 12px 24px;
+            font-size: 16px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        .feature-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #f0f6fc;
+            margin-bottom: 12px;
+        }
+        
+        .feature-card p {
+            color: #7d8590;
+            font-size: 14px;
+        }
+        
+        .stats {
+            background-color: #0d1117;
+            padding: 64px 0;
+            margin-top: 80px;
+        }
+        
+        .stats-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            text-align: center;
+        }
+        
+        .stats h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #f0f6fc;
+            margin-bottom: 16px;
+        }
+        
+        .stats p {
+            font-size: 18px;
+            color: #7d8590;
+            margin-bottom: 48px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: #f0f6fc;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: #7d8590;
+        }
+        
+        .footer {
+            background-color: #161b22;
+            border-top: 1px solid #30363d;
+            padding: 48px 0;
+            margin-top: 80px;
+        }
+        
+        .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+        }
+        
+        .footer-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f0f6fc;
+            margin-bottom: 16px;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 8px;
+        }
+        
+        .footer-section ul li a {
+            color: #7d8590;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .footer-section ul li a:hover {
+            color: #f0f6fc;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #30363d;
+            margin-top: 32px;
+            padding-top: 32px;
+            text-align: center;
+            color: #7d8590;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDBDNy4xNjMgMCAwIDcuMTYzIDAgMTZTMi4xNjMgMzIgMTYgMzJTMzIgMjQuODM3IDMyIDE2UzI0LjgzNyAwIDE2IDBaIiBmaWxsPSIjZjBmNmZjIi8+CjxwYXRoIGQ9Ik0xNiA4QzEwLjQ3NyA4IDYgMTIuNDc3IDYgMThTMTIuNDc3IDI4IDE2IDI4UzI2IDIzLjUyMyAyNiAxOFMyMjAuNTIzIDggMTYgOFoiIGZpbGw9IiMwZDExMTciLz4KPC9zdmc+" alt="GitHub Logo">
+                <span class="logo-text">GitHub</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#business">Business</a></li>
+                    <li><a href="#explore">Explore</a></li>
+                    <li><a href="#marketplace">Marketplace</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                </ul>
+            </nav>
+            
+            <input type="text" class="search-box" placeholder="Search or jump to...">
+            
+            <div class="auth-buttons">
+                <a href="#signin" class="btn btn-secondary">Sign in</a>
+                <a href="#signup" class="btn btn-primary">Sign up</a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <section class="hero">
+            <h1>Built for developers</h1>
+            <p>GitHub is a development platform inspired by the way you work. From open source to business, you can host and review code, manage projects, and build software alongside millions of other developers.</p>
+            
+            <div class="cta-buttons">
+                <a href="#signup" class="btn btn-primary btn-large">Sign up for GitHub</a>
+                <a href="#start-free" class="btn btn-secondary btn-large">Start a free enterprise trial</a>
+            </div>
+        </section>
+        
+        <section class="features">
+            <div class="feature-card">
+                <h3>Code</h3>
+                <p>Write better code with pull request code reviews, automated testing, and continuous integration.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Plan</h3>
+                <p>Organize your work with project boards, issues, and pull requests in one place.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Collaborate</h3>
+                <p>Work together with your team using powerful collaboration tools and workflows.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Automate</h3>
+                <p>Automate your workflow with GitHub Actions and powerful integrations.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Secure</h3>
+                <p>Keep your code secure with advanced security features and compliance tools.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Deploy</h3>
+                <p>Deploy your applications with confidence using GitHub's deployment tools.</p>
+            </div>
+        </section>
+        
+        <section class="stats">
+            <div class="stats-container">
+                <h2>Trusted by millions of developers</h2>
+                <p>Join the world's largest developer platform</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">100M+</div>
+                        <div class="stat-label">Repositories</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">90M+</div>
+                        <div class="stat-label">Developers</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">4M+</div>
+                        <div class="stat-label">Organizations</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">200+</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#security">Security</a></li>
+                    <li><a href="#enterprise">Enterprise</a></li>
+                    <li><a href="#customer-stories">Customer stories</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <ul>
+                    <li><a href="#developer-api">Developer API</a></li>
+                    <li><a href="#partners">Partners</a></li>
+                    <li><a href="#atom">Atom</a></li>
+                    <li><a href="#electron">Electron</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#help">Help</a></li>
+                    <li><a href="#community-forum">Community Forum</a></li>
+                    <li><a href="#professional-services">Professional Services</a></li>
+                    <li><a href="#learning-lab">Learning Lab</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#blog">Blog</a></li>
+                    <li><a href="#careers">Careers</a></li>
+                    <li><a href="#press">Press</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2024 GitHub, Inc. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

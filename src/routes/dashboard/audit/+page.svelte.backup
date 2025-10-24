@@ -1,0 +1,901 @@
+<script lang="ts">
+	import { Button } from '$lib/components/ui/button';
+	import {
+		Card,
+		CardContent,
+		CardDescription,
+		CardHeader,
+		CardTitle
+	} from '$lib/components/ui/card';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
+	import { Separator } from '$lib/components/ui/separator';
+	import { Upload, Link, AlertTriangle, CheckCircle, Download, RefreshCw } from 'lucide-svelte';
+	import { mockAuditReport } from '$lib/data/mock-data';
+
+	let websiteUrl = '';
+	let uploadedFile: File | null = null;
+	let showReport = false;
+	let isAnalyzing = false;
+	let auditData: any = null;
+	let error = '';
+	let processedViolations: any = null;
+
+	function handleFileUpload(event: Event) {
+		const target = event.target as HTMLInputElement;
+		if (target.files && target.files[0]) {
+			uploadedFile = target.files[0];
+		}
+	}
+
+	// Process violations into user-friendly, organized data
+	function processViolations(violations: any[]) {
+		if (!violations || violations.length === 0) {
+			return {
+				groupedIssues: {},
+				summary: { critical: 0, moderate: 0, minor: 0 },
+				priorityGroups: { high: [], medium: [], low: [] }
+			};
+		}
+
+		// Group violations by element type and location
+		const grouped: any = {};
+		const priorityGroups: any = { high: [], medium: [], low: [] };
+
+		violations.forEach(violation => {
+			const key = `${violation.elementType}-${violation.location}`;
+			if (!grouped[key]) {
+				grouped[key] = {
+					elementType: violation.elementType,
+					location: violation.location,
+					issues: [],
+					severity: violation.severity,
+					priority: violation.priority || 'Fix when possible'
+				};
+			}
+			grouped[key].issues.push(violation);
+
+			// Categorize by severity
+			if (violation.severity === 'high') {
+				priorityGroups.high.push(violation);
+			} else if (violation.severity === 'medium') {
+				priorityGroups.medium.push(violation);
+			} else {
+				priorityGroups.low.push(violation);
+			}
+		});
+
+		// Calculate summary
+		const summary = {
+			critical: priorityGroups.high.length,
+			moderate: priorityGroups.medium.length,
+			minor: priorityGroups.low.length
+		};
+
+		return {
+			groupedIssues: grouped,
+			summary,
+			priorityGroups
+		};
+	}
+
+	// Generate CSS fix for a violation
+	function generateCSSFix(violation: any): string {
+		const elementType = violation.elementType.toLowerCase();
+		const property = violation.issueType === 'color' ? 'color' : 
+						violation.issueType === 'typography' ? 'font-family' : 
+						violation.issueType === 'spacing' ? 'padding' : 'background-color';
+		
+		let selector = '';
+		if (elementType.includes('button')) {
+			selector = 'button, .btn, [type="button"]';
+		} else if (elementType.includes('h1')) {
+			selector = 'h1';
+		} else if (elementType.includes('h2')) {
+			selector = 'h2';
+		} else if (elementType.includes('h3')) {
+			selector = 'h3';
+		} else if (elementType.includes('logo')) {
+			selector = '.logo, header img, [class*="logo"]';
+		} else {
+			selector = elementType;
+		}
+
+		const value = violation.expected.includes('#') ? violation.expected : 
+					 violation.expected.includes('Inter') ? '"Inter", sans-serif' :
+					 violation.expected;
+
+		return `${selector} { ${property}: ${value} !important; }`;
+	}
+
+	async function startAudit() {
+		if (!websiteUrl.trim() && !uploadedFile) return;
+
+		isAnalyzing = true;
+		error = '';
+		auditData = null;
+
+		try {
+			if (websiteUrl.trim()) {
+				// Call the web scraping API
+				const response = await fetch('/api/audit', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ urlToAudit: websiteUrl })
+				});
+
+				const result = await response.json();
+				console.log('API Response:', result);
+
+				if (result.success) {
+					console.log('API Response successful:', result);
+					console.log('Setting audit data:', result.data.scrapedData);
+					console.log('Violations received:', result.data.violations);
+					console.log('Brand guideline received:', result.data.brandGuideline);
+					
+					// Set all state variables
+					auditData = result.data.scrapedData;
+					window.brandGuideline = result.data.brandGuideline;
+					window.analysis = result.data.violations; // Store the full analysis object
+					window.violations = result.data.violations.violations || result.data.violations; // Extract violations array
+					window.auditType = result.data.auditType;
+					
+					// Process violations for better UX
+					processedViolations = processViolations(window.violations);
+					
+					// Set the UI state
+					showReport = true;
+					isAnalyzing = false;
+					
+					console.log('State after setting:', { showReport, auditData: !!auditData, violations: window.violations?.length });
+				} else {
+					console.error('API Response failed:', result);
+					error = result.error || 'Failed to analyze the website';
+					isAnalyzing = false;
+				}
+			} else if (uploadedFile) {
+				// For now, simulate file analysis
+				// TODO: Implement file upload API
+				setTimeout(() => {
+					auditData = {
+						url: uploadedFile?.name || 'Unknown file',
+						title: uploadedFile?.name || 'Unknown file',
+						elements: [],
+						colors: [],
+						fonts: []
+					};
+					showReport = true;
+				}, 2000);
+			}
+		} catch (err) {
+			error = 'Network error. Please try again.';
+			console.error('Audit error:', err);
+			isAnalyzing = false;
+		}
+	}
+
+	function downloadReport() {
+		alert('Download functionality will be implemented in the full version!');
+	}
+
+	function downloadFixedVersion() {
+		alert('Download fixed version functionality will be implemented in the full version!');
+	}
+
+	function getSeverityColor(severity: string) {
+		switch (severity) {
+			case 'high':
+				return 'text-red-600 bg-red-50';
+			case 'medium':
+				return 'text-yellow-600 bg-yellow-50';
+			case 'low':
+				return 'text-blue-600 bg-blue-50';
+			default:
+				return 'text-gray-600 bg-gray-50';
+		}
+	}
+
+	function getSeverityIcon(severity: string) {
+		switch (severity) {
+			case 'high':
+				return 'h-4 w-4 text-red-500';
+			case 'medium':
+				return 'h-4 w-4 text-yellow-500';
+			case 'low':
+				return 'h-4 w-4 text-blue-500';
+			default:
+				return 'h-4 w-4 text-gray-500';
+		}
+	}
+</script>
+
+<div class="max-w-6xl">
+	<div class="mb-8">
+		<h1 class="mb-2 text-3xl font-bold text-gray-900">Brand Audit</h1>
+		<p class="text-gray-600">Analyze your website or assets against brand guidelines</p>
+	</div>
+
+	<div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+		<!-- Input Section -->
+		<div class="space-y-6">
+			<Card>
+				<CardHeader>
+					<CardTitle>Website Analysis</CardTitle>
+					<CardDescription>Enter your website URL to analyze brand compliance</CardDescription>
+				</CardHeader>
+				<CardContent class="space-y-4">
+					<div class="space-y-2">
+						<Label for="website-url">Website URL</Label>
+						<div class="flex gap-2">
+							<div class="relative flex-1">
+								<Link
+									class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400"
+								/>
+								<Input
+									id="website-url"
+									bind:value={websiteUrl}
+									placeholder="https://example.com"
+									class="pl-10"
+								/>
+								<div class="mt-2 text-xs text-gray-500">
+									<p class="mb-1">Try these test URLs:</p>
+									<div class="flex flex-wrap gap-2">
+										<button 
+											type="button" 
+											class="text-blue-600 hover:text-blue-800 underline"
+											onclick={() => websiteUrl = 'https://example.com'}
+										>
+											example.com
+										</button>
+										<button 
+											type="button" 
+											class="text-blue-600 hover:text-blue-800 underline"
+											onclick={() => websiteUrl = 'https://github.com'}
+										>
+											github.com
+										</button>
+										<button 
+											type="button" 
+											class="text-blue-600 hover:text-blue-800 underline"
+											onclick={() => websiteUrl = 'https://stackoverflow.com'}
+										>
+											stackoverflow.com
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			<div class="text-center">
+				<p class="mb-4 text-sm text-gray-500">or</p>
+			</div>
+
+			<Card>
+				<CardHeader>
+					<CardTitle>File Upload</CardTitle>
+					<CardDescription>Upload design files, screenshots, or documents to audit</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<div class="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+						<Upload class="mx-auto mb-4 h-12 w-12 text-gray-400" />
+						<div class="space-y-2">
+							<p class="text-sm font-medium text-gray-900">Upload files to audit</p>
+							<p class="text-xs text-gray-500">PDF, PNG, JPG, Figma files up to 10MB</p>
+						</div>
+						<input
+							type="file"
+							class="mt-4 block w-full text-sm text-gray-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
+							accept="image/*,.pdf,.fig"
+							onchange={handleFileUpload}
+						/>
+					</div>
+					{#if uploadedFile}
+						<p class="mt-2 text-sm text-gray-600">Selected: {uploadedFile.name}</p>
+					{/if}
+				</CardContent>
+			</Card>
+
+			<Button
+				class="w-full"
+				size="lg"
+				onclick={startAudit}
+				disabled={(!websiteUrl.trim() && !uploadedFile) || isAnalyzing}
+			>
+				{#if isAnalyzing}
+					<RefreshCw class="mr-2 h-4 w-4 animate-spin" />
+					Analyzing...
+				{:else}
+					Start Brand Audit
+				{/if}
+			</Button>
+		</div>
+
+		<!-- Results Section -->
+		<div class="space-y-6">
+			{#if isAnalyzing}
+				<Card>
+					<CardContent class="p-8 text-center">
+						<RefreshCw class="mx-auto mb-4 h-16 w-16 animate-spin text-blue-600" />
+						<h3 class="mb-2 text-lg font-medium text-gray-900">Analyzing Your Brand</h3>
+						<p class="text-gray-600">This may take a few moments...</p>
+						<div class="mt-4 space-y-2 text-sm text-gray-500">
+							<p>✓ Scanning color usage</p>
+							<p>✓ Checking typography</p>
+							<p>⏳ Analyzing layout consistency</p>
+							<p>⏳ Reviewing brand elements</p>
+						</div>
+					</CardContent>
+				</Card>
+			{:else if showReport && auditData}
+				<!-- Audit Results -->
+				<Card>
+					<CardHeader>
+						<CardTitle class="flex items-center justify-between">
+							<span>Audit Results</span>
+							<div class="flex items-center gap-2">
+								<span class="text-2xl font-bold text-blue-600">85</span>
+								<span class="text-sm text-gray-500">/100</span>
+							</div>
+						</CardTitle>
+						<CardDescription>
+							{auditData.url || auditData.title} has been analyzed
+						</CardDescription>
+					</CardHeader>
+					<CardContent class="space-y-6">
+						<!-- Website Info -->
+						<div class="rounded-lg bg-gray-50 p-4">
+							<h3 class="mb-2 font-semibold text-gray-900">Website Information</h3>
+							<p class="text-sm text-gray-600"><strong>Title:</strong> {auditData.title}</p>
+							<p class="text-sm text-gray-600"><strong>URL:</strong> {auditData.url}</p>
+							{#if auditData.metaDescription}
+								<p class="text-sm text-gray-600"><strong>Description:</strong> {auditData.metaDescription}</p>
+							{/if}
+						</div>
+
+						<!-- Brand Guideline Info (for testing) -->
+		{#if typeof window !== 'undefined' && window.brandGuideline}
+			<div class="rounded-lg bg-blue-50 p-4">
+				<h3 class="mb-2 font-semibold text-gray-900">
+					Brand Guideline 
+					{#if typeof window !== 'undefined' && window.auditType === 'github_mock'}
+						(GitHub Brand Guidelines)
+					{:else if typeof window !== 'undefined' && window.auditType === 'buffer_brand'}
+						(Buffer Brand Guidelines)
+					{:else if typeof window !== 'undefined' && window.auditType === 'apple_brand'}
+						(Apple Brand Guidelines)
+					{:else}
+						(Mock SaaSGamma Guidelines)
+					{/if}
+				</h3>
+								<p class="text-sm text-gray-600"><strong>Brand:</strong> {window.brandGuideline?.brandName || 'N/A'}</p>
+								<p class="text-sm text-gray-600"><strong>Version:</strong> {window.brandGuideline?.version || 'N/A'}</p>
+								<div class="mt-2">
+									<h4 class="text-sm font-medium text-gray-700">Primary Colors:</h4>
+									<div class="flex gap-2 mt-1">
+									<div class="flex items-center gap-1">
+										<div class="w-4 h-4 rounded border" style="background-color: {window.brandGuideline?.colors?.primary?.hex || '#000000'}"></div>
+										<span class="text-xs text-gray-600">{window.brandGuideline?.colors?.primary?.hex || 'N/A'}</span>
+									</div>
+									<div class="flex items-center gap-1">
+										<div class="w-4 h-4 rounded border" style="background-color: {window.brandGuideline?.colors?.secondary?.hex || '#000000'}"></div>
+										<span class="text-xs text-gray-600">{window.brandGuideline?.colors?.secondary?.hex || 'N/A'}</span>
+									</div>
+									<div class="flex items-center gap-1">
+										<div class="w-4 h-4 rounded border" style="background-color: {window.brandGuideline?.colors?.accent?.hex || '#000000'}"></div>
+										<span class="text-xs text-gray-600">{window.brandGuideline?.colors?.accent?.hex || 'N/A'}</span>
+									</div>
+									</div>
+								</div>
+								<div class="mt-2">
+									<h4 class="text-sm font-medium text-gray-700">Typography:</h4>
+									<p class="text-xs text-gray-600">{window.brandGuideline?.typography?.primaryFont || 'N/A'} / {window.brandGuideline?.typography?.fallbackFont || 'N/A'}</p>
+								</div>
+							</div>
+						{/if}
+
+						<!-- Brand Compliance Analysis -->
+						{#if typeof window !== 'undefined' && window.violations}
+							<div class="rounded-lg bg-red-50 p-4">
+								<div class="mb-4 flex items-center justify-between">
+									<h3 class="text-lg font-semibold text-gray-900">Brand Compliance Analysis</h3>
+									<div class="text-right">
+										<div class="text-2xl font-bold text-red-600">{window.analysis?.score || 0}/100</div>
+										<div class="text-sm text-gray-600">Compliance Score</div>
+									</div>
+								</div>
+								
+								<div class="mb-4 grid grid-cols-3 gap-4">
+									<div class="text-center">
+										<div class="text-xl font-bold text-red-600">{window.analysis?.severityBreakdown?.high || 0}</div>
+										<div class="text-sm text-gray-600">Critical Issues</div>
+									</div>
+									<div class="text-center">
+										<div class="text-xl font-bold text-yellow-600">{window.analysis?.severityBreakdown?.medium || 0}</div>
+										<div class="text-sm text-gray-600">Moderate Issues</div>
+									</div>
+									<div class="text-center">
+										<div class="text-xl font-bold text-blue-600">{window.analysis?.severityBreakdown?.low || 0}</div>
+										<div class="text-sm text-gray-600">Minor Issues</div>
+									</div>
+								</div>
+
+								<div class="mb-4">
+									<h4 class="mb-2 text-sm font-medium text-gray-700">Overall Status</h4>
+									<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {
+										window.analysis?.summary?.overallCompliance === 'Good' ? 'bg-green-100 text-green-800' :
+										window.analysis?.summary?.overallCompliance === 'Needs Improvement' ? 'bg-yellow-100 text-yellow-800' :
+										'bg-red-100 text-red-800'
+									}">
+										{window.analysis?.summary?.overallCompliance || 'Unknown'}
+									</span>
+								</div>
+							</div>
+						{/if}
+
+						<!-- User-Friendly Audit Report -->
+		{#if typeof window !== 'undefined' && window.violations && window.violations.length > 0 && processedViolations}
+			<div class="space-y-8">
+				<!-- Score Header -->
+				<div class="text-center bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-8">
+					<div class="text-6xl font-bold text-gray-900 mb-2">
+						{window.analysis?.score || 0}/100
+					</div>
+					<div class="text-xl text-gray-600 mb-4">
+						{#if (window.analysis?.score || 0) >= 90}
+							🎉 Excellent! Your brand is highly consistent
+						{:else if (window.analysis?.score || 0) >= 80}
+							👍 Good! Just a few tweaks needed
+						{:else if (window.analysis?.score || 0) >= 60}
+							⚠️ Needs improvement - let's fix the key issues
+						{:else}
+							🚨 Critical issues found - immediate action needed
+						{/if}
+					</div>
+					<div class="flex items-center justify-center gap-2">
+						{#if typeof window !== 'undefined' && window.analysis?.analysisType === 'real_llm'}
+							<span class="rounded bg-green-100 px-3 py-1 text-sm font-medium text-green-800">🤖 Real AI Analysis (Gemini)</span>
+						{:else if typeof window !== 'undefined' && window.analysis?.analysisType === 'free_rule_based'}
+							<span class="rounded bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">🔍 Free Rule-Based Analysis</span>
+						{:else}
+							<span class="rounded bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">🧪 Mock Analysis</span>
+						{/if}
+					</div>
+				</div>
+
+				<!-- Priority Summary -->
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+					{#if processedViolations.summary.critical > 0}
+						<div class="bg-red-50 border border-red-200 rounded-lg p-4">
+							<div class="flex items-center gap-2 mb-2">
+								<div class="text-2xl">🚨</div>
+								<h3 class="text-lg font-semibold text-red-900">Critical Issues</h3>
+							</div>
+							<div class="text-3xl font-bold text-red-600 mb-1">{processedViolations.summary.critical}</div>
+							<p class="text-sm text-red-700">Fix these immediately to maintain brand credibility</p>
+						</div>
+					{/if}
+					
+					{#if processedViolations.summary.moderate > 0}
+						<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+							<div class="flex items-center gap-2 mb-2">
+								<div class="text-2xl">⚠️</div>
+								<h3 class="text-lg font-semibold text-yellow-900">Recommended Fixes</h3>
+							</div>
+							<div class="text-3xl font-bold text-yellow-600 mb-1">{processedViolations.summary.moderate}</div>
+							<p class="text-sm text-yellow-700">Improve consistency and professionalism</p>
+						</div>
+					{/if}
+					
+					{#if processedViolations.summary.minor > 0}
+						<div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+							<div class="flex items-center gap-2 mb-2">
+								<div class="text-2xl">✨</div>
+								<h3 class="text-lg font-semibold text-blue-900">Minor Tweaks</h3>
+							</div>
+							<div class="text-3xl font-bold text-blue-600 mb-1">{processedViolations.summary.minor}</div>
+							<p class="text-sm text-blue-700">Polish for perfect brand experience</p>
+						</div>
+					{/if}
+				</div>
+
+				<!-- Grouped Issues -->
+				<div class="space-y-6">
+					<h3 class="text-2xl font-bold text-gray-900">Action Plan</h3>
+					
+					{#each Object.entries(processedViolations.groupedIssues) as [key, group]}
+						<div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+							<div class="flex items-center justify-between mb-4">
+								<div class="flex items-center gap-3">
+									<div class="text-2xl">
+										{#if group.elementType.includes('button')}
+											🔘
+										{:else if group.elementType.includes('h1')}
+											📋
+										{:else if group.elementType.includes('h2')}
+											📝
+										{:else if group.elementType.includes('h3')}
+											📄
+										{:else if group.elementType.includes('logo')}
+											🏷️
+										{:else if group.elementType.includes('color')}
+											🎨
+										{:else if group.elementType.includes('typography')}
+											📝
+										{:else}
+											🔧
+										{/if}
+									</div>
+									<div>
+										<h4 class="text-lg font-semibold text-gray-900">{group.location}</h4>
+										<p class="text-sm text-gray-600">{group.issues.length} issue{group.issues.length > 1 ? 's' : ''} found</p>
+									</div>
+								</div>
+								<div class="flex items-center gap-2">
+									<span class="rounded-full px-3 py-1 text-sm font-medium {
+										group.severity === 'high' ? 'bg-red-100 text-red-800' :
+										group.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+										'bg-blue-100 text-blue-800'
+									}">
+										{group.severity?.toUpperCase() || 'UNKNOWN'}
+									</span>
+									{#if group.priority}
+										<span class="rounded-full px-3 py-1 text-sm font-medium bg-gray-100 text-gray-800">
+											{group.priority}
+										</span>
+									{/if}
+								</div>
+							</div>
+
+							<div class="space-y-4">
+								{#each group.issues as violation}
+									<div class="bg-gray-50 rounded-lg p-4">
+										<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+											<div>
+												<div class="text-sm font-medium text-gray-700 mb-1">❌ Current:</div>
+												<div class="text-sm text-gray-600 font-mono bg-red-50 p-2 rounded border-l-4 border-red-200">
+													{violation.found}
+												</div>
+											</div>
+											<div>
+												<div class="text-sm font-medium text-gray-700 mb-1">✅ Should be:</div>
+												<div class="text-sm text-gray-600 font-mono bg-green-50 p-2 rounded border-l-4 border-green-200">
+													{violation.expected}
+												</div>
+											</div>
+										</div>
+										
+										{#if violation.impact}
+											<div class="mb-3">
+												<div class="text-sm font-medium text-gray-700 mb-1">💥 Impact:</div>
+												<div class="text-sm text-gray-600">{violation.impact}</div>
+											</div>
+										{/if}
+
+										<div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+											<div class="text-sm font-medium text-blue-900 mb-2">💡 How to fix:</div>
+											<div class="text-sm text-blue-800 mb-3">{violation.suggestion}</div>
+											
+											<!-- CSS Fix Button -->
+											<details class="mt-3">
+												<summary class="text-sm font-medium text-blue-700 cursor-pointer hover:text-blue-900">
+													🔧 Show CSS Fix
+												</summary>
+												<div class="mt-2 bg-gray-900 text-green-400 p-3 rounded font-mono text-sm overflow-x-auto">
+													{generateCSSFix(violation)}
+												</div>
+											</details>
+										</div>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
+			<Separator />
+		{/if}
+
+						<Separator />
+
+						<!-- Colors Found -->
+						{#if auditData.colors && auditData.colors.length > 0}
+							<div>
+								<h3 class="mb-3 font-semibold text-gray-900">Colors Found ({auditData.colors.length})</h3>
+								<div class="flex flex-wrap gap-2">
+									{#each auditData.colors as color}
+										<div class="flex items-center gap-2 rounded-lg border border-gray-200 p-2">
+											<div 
+												class="h-6 w-6 rounded border border-gray-300" 
+												style="background-color: {color}"
+											></div>
+											<span class="text-xs text-gray-600">{color}</span>
+										</div>
+									{/each}
+								</div>
+							</div>
+							<Separator />
+						{/if}
+
+						<!-- Fonts Found -->
+						{#if auditData.fonts && auditData.fonts.length > 0}
+							<div>
+								<h3 class="mb-3 font-semibold text-gray-900">Fonts Found ({auditData.fonts.length})</h3>
+								<div class="space-y-2">
+									{#each auditData.fonts as font}
+										<div class="rounded-lg border border-gray-200 p-3">
+											<span class="text-sm font-medium text-gray-900" style="font-family: {font}">{font}</span>
+										</div>
+									{/each}
+								</div>
+							</div>
+							<Separator />
+						{/if}
+
+						<!-- Logo Analysis -->
+						{#if auditData.elements && auditData.elements.some((el: any) => el.type === 'logo')}
+							<div>
+								<h3 class="mb-3 font-semibold text-gray-900">Logo Analysis</h3>
+								{#each auditData.elements.filter((el: any) => el.type === 'logo') as logo}
+									<div class="rounded-lg border border-gray-200 p-4">
+										<div class="mb-3 flex items-center gap-3">
+											<span class="rounded bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800">
+												LOGO
+											</span>
+											{#if logo.alt}
+												<span class="text-sm text-gray-600">"{logo.alt}"</span>
+											{/if}
+										</div>
+										<div class="grid grid-cols-2 gap-4">
+											<div>
+												<h4 class="mb-2 text-sm font-medium text-gray-700">Dimensions</h4>
+												<div class="space-y-1 text-xs text-gray-500">
+													<div><span class="font-medium">Width:</span> {logo.styles?.width || 'N/A'}</div>
+													<div><span class="font-medium">Height:</span> {logo.styles?.height || 'N/A'}</div>
+													{#if logo.size}
+														<div><span class="font-medium">Actual Size:</span> {Math.round(logo.size.width)}×{Math.round(logo.size.height)}px</div>
+													{/if}
+												</div>
+											</div>
+											<div>
+												<h4 class="mb-2 text-sm font-medium text-gray-700">Spacing</h4>
+												<div class="space-y-1 text-xs text-gray-500">
+													<div><span class="font-medium">Margin:</span> {logo.styles?.margin || 'N/A'}</div>
+													<div><span class="font-medium">Padding:</span> {logo.styles?.padding || 'N/A'}</div>
+												</div>
+											</div>
+										</div>
+										
+										<!-- Logo Colors -->
+										{#if logo.colors && logo.colors.length > 0}
+											<div class="mt-4">
+												<h4 class="mb-2 text-sm font-medium text-gray-700">Logo Colors ({logo.colors.length})</h4>
+												<div class="flex flex-wrap gap-2">
+													{#each logo.colors as color}
+														<div class="flex items-center gap-2 rounded-lg border border-gray-200 p-2">
+															<div 
+																class="h-4 w-4 rounded border border-gray-300" 
+																style="background-color: {color}"
+															></div>
+															<span class="text-xs text-gray-600">{color}</span>
+														</div>
+													{/each}
+												</div>
+											</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+							<Separator />
+						{/if}
+
+						<!-- Navigation Analysis -->
+						{#if auditData.elements && auditData.elements.some((el: any) => el.type === 'navigation')}
+							<div>
+								<h3 class="mb-3 font-semibold text-gray-900">Navigation Analysis</h3>
+								{#each auditData.elements.filter((el: any) => el.type === 'navigation') as nav}
+									<div class="rounded-lg border border-gray-200 p-4">
+										<div class="mb-3 flex items-center gap-2">
+											<span class="rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+												NAVIGATION
+											</span>
+											<span class="text-sm text-gray-600">{nav.items?.length || 0} items</span>
+										</div>
+										{#if nav.items && nav.items.length > 0}
+											<div class="mb-3">
+												<h4 class="mb-2 text-sm font-medium text-gray-700">Menu Items</h4>
+												<div class="flex flex-wrap gap-2">
+													{#each nav.items as item}
+														<span class="rounded bg-gray-100 px-2 py-1 text-xs text-gray-600">
+															{item.text}
+														</span>
+													{/each}
+												</div>
+											</div>
+										{/if}
+										{#if nav.styles}
+											<div class="grid grid-cols-2 gap-2 text-xs text-gray-500">
+												{#each Object.entries(nav.styles) as [key, value]}
+													{#if value}
+														<div>
+															<span class="font-medium">{key}:</span> {value}
+														</div>
+													{/if}
+												{/each}
+											</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+							<Separator />
+						{/if}
+
+						<!-- Form Elements Analysis -->
+						{#if auditData.elements && auditData.elements.some((el: any) => el.type === 'form_input')}
+							<div>
+								<h3 class="mb-3 font-semibold text-gray-900">Form Elements ({auditData.elements.filter((el: any) => el.type === 'form_input').length})</h3>
+								<div class="space-y-2">
+									{#each auditData.elements.filter((el: any) => el.type === 'form_input').slice(0, 5) as input}
+										<div class="rounded-lg border border-gray-200 p-3">
+											<div class="mb-2 flex items-center gap-2">
+												<span class="rounded bg-orange-100 px-2 py-1 text-xs font-medium text-orange-800">
+													{input.inputType?.toUpperCase() || 'INPUT'}
+												</span>
+												{#if input.placeholder}
+													<span class="text-sm text-gray-600">"{input.placeholder}"</span>
+												{/if}
+											</div>
+											{#if input.styles}
+												<div class="grid grid-cols-2 gap-2 text-xs text-gray-500">
+													{#each Object.entries(input.styles) as [key, value]}
+														{#if value}
+															<div>
+																<span class="font-medium">{key}:</span> {value}
+															</div>
+														{/if}
+													{/each}
+												</div>
+											{/if}
+										</div>
+									{/each}
+									{#if auditData.elements.filter((el: any) => el.type === 'form_input').length > 5}
+										<p class="text-sm text-gray-500">... and {auditData.elements.filter((el: any) => el.type === 'form_input').length - 5} more form elements</p>
+									{/if}
+								</div>
+							</div>
+							<Separator />
+						{/if}
+
+						<!-- Layout Containers Analysis -->
+						{#if auditData.elements && auditData.elements.some((el: any) => el.type === 'layout_container')}
+							<div>
+								<h3 class="mb-3 font-semibold text-gray-900">Layout Structure</h3>
+								<div class="space-y-2">
+									{#each auditData.elements.filter((el: any) => el.type === 'layout_container') as container}
+										<div class="rounded-lg border border-gray-200 p-3">
+											<div class="mb-2 flex items-center gap-2">
+												<span class="rounded bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-800">
+													{container.tag}
+												</span>
+												{#if container.position}
+													<span class="text-sm text-gray-600">
+														{Math.round(container.position.width)}×{Math.round(container.position.height)}px
+													</span>
+												{/if}
+											</div>
+											{#if container.styles}
+												<div class="grid grid-cols-2 gap-2 text-xs text-gray-500">
+													{#each Object.entries(container.styles) as [key, value]}
+														{#if value}
+															<div>
+																<span class="font-medium">{key}:</span> {value}
+															</div>
+														{/if}
+													{/each}
+												</div>
+											{/if}
+										</div>
+									{/each}
+								</div>
+							</div>
+							<Separator />
+						{/if}
+
+						<!-- Other Elements Found -->
+						{#if auditData.elements && auditData.elements.filter((el: any) => !['logo', 'navigation', 'form_input', 'layout_container'].includes(el.type)).length > 0}
+							<div>
+								<h3 class="mb-3 font-semibold text-gray-900">Other Elements ({auditData.elements.filter((el: any) => !['logo', 'navigation', 'form_input', 'layout_container'].includes(el.type)).length})</h3>
+								<div class="space-y-3">
+									{#each auditData.elements.filter((el: any) => !['logo', 'navigation', 'form_input', 'layout_container'].includes(el.type)).slice(0, 8) as element}
+										<div class="rounded-lg border border-gray-200 p-3">
+											<div class="mb-2 flex items-center gap-2">
+												<span class="rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+													{element.type?.toUpperCase()}
+												</span>
+												{#if element.text}
+													<span class="text-sm text-gray-600">"{element.text}"</span>
+												{/if}
+											</div>
+											{#if element.styles}
+												<div class="grid grid-cols-2 gap-2 text-xs text-gray-500">
+													{#each Object.entries(element.styles) as [key, value]}
+														{#if value}
+															<div>
+																<span class="font-medium">{key}:</span> {value}
+															</div>
+														{/if}
+													{/each}
+												</div>
+											{/if}
+										</div>
+									{/each}
+									{#if auditData.elements.filter((el: any) => !['logo', 'navigation', 'form_input', 'layout_container'].includes(el.type)).length > 8}
+										<p class="text-sm text-gray-500">... and {auditData.elements.filter((el: any) => !['logo', 'navigation', 'form_input', 'layout_container'].includes(el.type)).length - 8} more elements</p>
+									{/if}
+								</div>
+							</div>
+							<Separator />
+						{/if}
+
+						<!-- Screenshot Preview -->
+						{#if auditData.screenshot}
+							<div>
+								<h3 class="mb-3 font-semibold text-gray-900">Website Screenshot</h3>
+								<div class="rounded-lg border border-gray-200 p-4">
+									<img 
+										src="data:image/png;base64,{auditData.screenshot}" 
+										alt="Website screenshot" 
+										class="max-w-full rounded border border-gray-200"
+									/>
+								</div>
+							</div>
+							<Separator />
+						{/if}
+
+						<div class="flex gap-3">
+							<Button class="flex-1" onclick={downloadReport}>
+								<Download class="mr-2 h-4 w-4" />
+								Download Report
+							</Button>
+							<Button variant="outline" class="flex-1" onclick={downloadFixedVersion}>
+								Download Fixed Version
+							</Button>
+						</div>
+					</CardContent>
+				</Card>
+			{:else if error}
+				<Card>
+					<CardContent class="p-8 text-center">
+						<AlertTriangle class="mx-auto mb-4 h-16 w-16 text-red-500" />
+						<h3 class="mb-2 text-lg font-medium text-gray-900">Analysis Failed</h3>
+						<p class="text-red-600">{error}</p>
+						<Button class="mt-4" onclick={() => { error = ''; showReport = false; }}>
+							Try Again
+						</Button>
+					</CardContent>
+				</Card>
+			{:else}
+				<Card class="flex h-96 items-center justify-center">
+					<div class="text-center text-gray-500">
+						<AlertTriangle class="mx-auto mb-4 h-16 w-16 opacity-50" />
+						<p class="mb-2 text-lg font-medium">Audit Results</p>
+						<p class="text-sm">Enter a website URL or upload files to start the brand audit</p>
+					</div>
+				</Card>
+			{/if}
+			
+			<!-- Fallback: Always show if we have violations -->
+			{#if typeof window !== 'undefined' && window.violations && window.violations.length > 0}
+				<div class="p-4 bg-red-100 rounded">
+					<strong>🚨 FALLBACK: Violations Found ({window.violations.length})</strong><br>
+					This is showing because we have violations but the main condition failed.<br>
+					showReport: {showReport}, auditData: {auditData ? 'Present' : 'Missing'}
+				</div>
+			{/if}
+		</div>
+	</div>
+</div>

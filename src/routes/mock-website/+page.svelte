@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaSGamma - We Break Our Own Rules (Test Site)</title>
+    <meta name="description" content="This is a test website that intentionally violates brand guidelines to test our AI audit system.">
+    <style>
+        /* Let's break some rules! */
+        body { 
+            font-family: Arial, sans-serif; /* ERROR: Not using Inter */
+            background-color: #f0f0f0; /* ERROR: Not using brand colors */
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1400px; /* ERROR: Exceeds 1200px max width */
+            margin: 0 auto;
+            padding: 10px; /* ERROR: Should be 32px */
+        }
+        
+        header {
+            background-color: #8B5CF6; /* ERROR: Using forbidden purple */
+            padding: 20px; /* ERROR: Should be 64px */
+            margin-bottom: 5px; /* ERROR: Should be 16px+ */
+        }
+        
+        .logo {
+            width: 80px; /* ERROR: Too small, should be 120px+ */
+            height: 20px; /* ERROR: Wrong aspect ratio */
+            margin: 5px; /* ERROR: Should be 24px clear space */
+            background-color: #EF4444; /* ERROR: Using forbidden red */
+        }
+        
+        h1 { 
+            color: #EF4444; /* ERROR: Using forbidden red instead of primary blue */
+            font-size: 3rem; /* ERROR: Should be 2.5rem */
+            font-weight: 900; /* ERROR: Should be 700 */
+            font-family: "Comic Sans MS", cursive; /* ERROR: Forbidden font */
+            margin: 10px 0; /* ERROR: Should use 8px multiples */
+        }
+        
+        h2 {
+            color: #8B5CF6; /* ERROR: Using forbidden purple */
+            font-size: 1.8rem; /* ERROR: Should be 2rem */
+            font-weight: 400; /* ERROR: Should be 600 */
+            margin: 5px 0; /* ERROR: Should use 8px multiples */
+        }
+        
+        p {
+            color: #666; /* ERROR: Should use brand neutral colors */
+            font-size: 1.2rem; /* ERROR: Should be 1rem */
+            line-height: 1.2; /* ERROR: Should be 1.6 */
+            margin: 8px 0; /* ERROR: Should use 8px multiples */
+        }
+        
+        .btn-primary { 
+            background-color: #8B5CF6; /* ERROR: Using forbidden purple instead of primary blue */
+            color: #000; /* ERROR: Should be white */
+            border: none;
+            padding: 8px 16px; /* ERROR: Should be 12px 24px */
+            border-radius: 20px; /* ERROR: Should be 8px */
+            font-size: 0.9rem; /* ERROR: Should be 1rem */
+            font-weight: 300; /* ERROR: Should be 500 */
+            margin: 5px; /* ERROR: Should use 8px multiples */
+        }
+        
+        .btn-secondary {
+            background-color: #EC4899; /* ERROR: Using forbidden pink */
+            color: #FFF;
+            border: 3px solid #8B5CF6; /* ERROR: Should be 2px, wrong color */
+            padding: 15px 30px; /* ERROR: Should be 12px 24px */
+            border-radius: 0px; /* ERROR: Should be 8px */
+            font-family: "Times New Roman", serif; /* ERROR: Forbidden font */
+        }
+        
+        .section {
+            padding: 20px; /* ERROR: Should be 64px */
+            margin: 10px 0; /* ERROR: Should use 8px multiples */
+            background-color: #FFE4E1; /* ERROR: Using non-brand color */
+        }
+        
+        .highlight {
+            background-color: #FFD700; /* ERROR: Using non-brand color */
+            color: #8B5CF6; /* ERROR: Using forbidden purple */
+            padding: 2px; /* ERROR: Should use 8px multiples */
+        }
+        
+        .form-input {
+            border: 5px solid #8B5CF6; /* ERROR: Too thick, wrong color */
+            border-radius: 15px; /* ERROR: Should be 8px */
+            padding: 5px; /* ERROR: Should use 8px multiples */
+            font-family: "Courier New", monospace; /* ERROR: Forbidden font */
+            background-color: #F0F8FF; /* ERROR: Non-brand color */
+        }
+        
+        .navigation {
+            background-color: #FF6B6B; /* ERROR: Using non-brand color */
+            padding: 10px; /* ERROR: Should use 8px multiples */
+        }
+        
+        .nav-link {
+            color: #8B5CF6; /* ERROR: Using forbidden purple */
+            text-decoration: underline; /* ERROR: Should be consistent with brand */
+            font-weight: 700; /* ERROR: Should be 500 */
+            margin: 3px; /* ERROR: Should use 8px multiples */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- ERROR: Logo is too small, wrong aspect ratio, wrong color, insufficient margin -->
+        <div class="logo">SaaSGamma Logo</div>
+        <nav class="navigation">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/about" class="nav-link">About</a>
+            <a href="/contact" class="nav-link">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main>
+            <!-- ERROR: Wrong color, wrong font, wrong size, wrong weight -->
+            <h1>Welcome to SaaSGamma!!!</h1>
+            
+            <!-- ERROR: Tone of voice is unprofessional -->
+            <p>We're the most bestest company in the whole wide world for realsies! Our epic, insane platform will literally blow your mind!!! It's super cool and awesome and totally amazing!</p>
+            
+            <!-- ERROR: Wrong color, wrong font size, wrong line height -->
+            <p>Our revolutionary technology is absolutely mind-blowing and will transform your business in ways you never thought possible. It's like magic but better!</p>
+            
+            <!-- ERROR: Wrong heading color, wrong size, wrong weight -->
+            <h2>Why Choose Us?</h2>
+            
+            <!-- ERROR: Wrong background color, wrong padding -->
+            <div class="section">
+                <p>We offer the most incredible features that are totally awesome and will make your life so much easier. You'll love how amazing everything is!</p>
+                
+                <!-- ERROR: Wrong button colors, wrong padding, wrong border radius -->
+                <button class="btn-primary">Sign Up Now!!!</button>
+                <button class="btn-secondary">Learn More</button>
+            </div>
+            
+            <!-- ERROR: Wrong highlight colors -->
+            <p>Don't miss out on this <span class="highlight">incredible opportunity</span> to join thousands of satisfied customers!</p>
+            
+            <!-- ERROR: Wrong form styling -->
+            <div class="section">
+                <h2>Get Started Today!</h2>
+                <input type="email" class="form-input" placeholder="Enter your email address" />
+                <input type="text" class="form-input" placeholder="Your company name" />
+            </div>
+        </main>
+    </div>
+</body>
+</html>

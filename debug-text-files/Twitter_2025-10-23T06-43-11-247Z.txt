@@ -1,0 +1,179 @@
+ï»¿Brand
+Quick Guide
+
+For External Partners
+August 2023 v1.0
+
+1Welcome
+
+This document is the beginning of our brand journey as X.
+
+We know many partners use our logos in a variety of places
+to help signpost where your audience can ï¬nd you.
+
+We also appreciate the importance of keeping this
+information up-to-date and accurate.
+
+With that in mind, this document provides details on how to
+use our new branding including logo use, primary colors,
+typography, terminology, posts and asset download.
+
+Please note that as we continue to build out X, we will continue
+to update and evolve our guidance. This guide isn't exhaustive,
+please reach out to your X brand partner if you are looking for
+something that isn't speciï¬cally covered here.
+
+2Logo
+
+The X logo is black or white. It must be legible and maintain the
+integrity of its form. Our logo should be large and clear in external
+communications.
+
+Color Treatment
+Logo should be white on black background or black on white
+background.
+
+Clearspace
+The empty space around the logo should be at minimum equal
+width left, right, top, bottom.
+
+Exception: For non-digital or non-monochrome environments, the logo
+should be white on darker backgrounds and black on lighter backgrounds.
+
+3Logo Lockup
+
+We use the logo pairing lockups to clearly show an account in on
+X. When pairing a username with the X logo, make sure the logo is
+white or black, and we recommend pairing it with the username in
+black. Observe our clear space rules, and scale the text to 100%
+of the height of the logo. Feel free to use a typeface thatâs from
+your brandâs design system.
+
+Aligning partnership logos should also follow clear space rules.
+
+4Primary Colors
+
+Our primary colors are black and white. Black plays a very
+important role in all brand assets and should provide balance with
+white. Together, they ensure neutrality, communicate powerfully
+and provide consistency across brand communications.
+
+Note: We are currently developing the secondary colors and will include
+them in an updated version of the brand guidelines.
+
+X Black X White
+
+HEX #000000
+RGB 0 0 0
+CMYK 0 0 0 100
+Pantone Black 6 C
+HEX #FFFFFF
+RGB 255 255 255
+CMYK 0 0 0 0
+Pantone White
+
+5Typography
+
+Use these type styles for consistency.
+
+Please reference the type style and size parameters.
+
+HEADLINES  |  HELVETICA NEUE BOLD, 60 - 75 PT
+Hello,
+X
+BODY COPY  |  HELVETICA NEUE NORMAL, 18 - 24PT
+We partnered with media agency 1 and media
+agency 2 to understand what factors inï¬uence a
+consumerâs purchase decision. Â¼ of a consumerâs
+purchase decision is driven by how culturally relevant
+the brand is -- that is not insigniï¬cant.
+
+DATA NUMBERS  | HELVETICA NEUE BOLD, 75 - 100PT
+SUB-HEADLINES  |  HELVETICA NEUE BOLD, 24 - 40 PT +
+This is a beautiful 18%
+sub-headline
+DATA SUPPORTING | HELVETICA NEUE NORMAL, 20 - 22PT
+
+CONTENT HEADLINE  | HELVETICA NEUE BOLD, 28 PT
+This is a beautiful
+content headline
+MESSAGE
+ASSOCIATION
+SOURCE  |  HELVETICA NEUE NORMAL, 16 PT
+
+Source: X Internal Data (Semantic Core). US Only. Graph: 7-day rolling
+average post volume, 4/1/23 â 7/17/23. Growth Metric: Daily average
+post growth month over month, 6/1/23 â 7/17/23. Data retrieved
+7/17/23.
+
+If you are already using Chirp font, you may continue to use it until a revised version of the brand guidelines is released
+with a custom toolkit. 6Terminology
+
+Introducing our glossary of key terms! This reference tool is designed to
+deï¬ne and help you use X brand terminology.
+
+Note: An extensive glossary of terms will feature in a future version of the brand guidelines.
+
+Before After Example usage
+Twitter X âThis is for employees of X onlyâ
+Twitter app X app âDownload the X appâ
+Twitter account X account âCreate your X accountâ
+Tweet post "Share your post." "Add another post"
+Retweet repost "This is a repost"
+Quote Tweet Quote "This is a Quote"
+Protected Tweets protected posts âRequest to follow them to view their
+protected postsâ
+Replies replies "Read your replies"
+Tweeter author* "See more posts from this author"
+Pinned Tweet pinned post "View your pinned posts". "This post
+was pinned"
+Promoted Tweet promoted post "View their promoted post"
+Twitter Spaces Spaces** "Go live on Spaces"
+Twitter Blue X Premium "Subscribe to X Premium"
+TweetDeck X Pro "Subscribe to X Pro."
+Twitter Ads Ads** "Go to ads.x.com to see your Ads."
+
+*Can also use "users" or "subscribers" or "account" or "creator" depending on the context. 7
+**Can also use X Spaces / X Ads depending on the contextPosts
+
+We use posts to highlight conversations and tell stories. They
+should always retain their basic structure.
+
+We increase the size of the post content to better ï¬t formats, to
+amplify the post and its message, and to make sure the post can
+work as a tagline or statement.
+
+Dark mode posts are preferred. White can be used as an alternative
+to dark mode when the color scheme or context feels appropriate.
+
+Include our logo in the top right so that when used, our brand is
+recognized.
+
+8Brand Assets
+
+Click HERE to download the following brand toolkit assets:
+
+â X White Logo.png
+â X Black Logo.png
+â X Alpha Logo .svg (transparent)
+â X @handle Lockup.ai
+â X Partnership Lockup.ai
+â Post Layout.ai
+
+By using the X brands in these guidelines (the âGuidelinesâ), you agree to the Guidelines as well as our
+Terms of Service and all other X rules and policies. X Corp (âXâ) reserves the right to cancel, modify, or
+change this policy at any time at its sole discretion without notice.
+
+These Guidelines apply to your use of the X brands. You may use the X brands solely for the purposes
+expressly authorized by X.
+
+Strict compliance with these Guidelines is required at all times, and any use of the X brands in
+violation of these Guidelines will automatically terminate any permission related to your use of the X
+brands.
+
+X reserves the right to grant or deny any permission at its sole discretion and for any reason. X further
+reserves the rights, exercisable at its sole discretion, to modify these Guidelines and/or the X brands
+at any time and to take appropriate action against any unauthorized or nonconforming use of the X
+brands. 9Thank you
+
+10

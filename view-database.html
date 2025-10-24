@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Viewer - Brand Guidelines</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .brand-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        .brand-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .brand-details {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .json-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .json-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .json-content {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #333;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #168eea;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ Brand Guidelines Database</h1>
+            <p>View all brand guidelines stored in your PostgreSQL database</p>
+        </div>
+        
+        <div id="loading" class="loading">
+            <p>🔄 Loading database data...</p>
+        </div>
+        
+        <div id="error" class="error" style="display: none;">
+            <p>❌ Error loading data. Make sure your SvelteKit server is running.</p>
+        </div>
+        
+        <div id="content" style="display: none;">
+            <div class="stats" id="stats"></div>
+            <div id="brands"></div>
+        </div>
+    </div>
+
+    <script>
+        async function loadDatabaseData() {
+            try {
+                const response = await fetch('/api/brands');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayData(data.data);
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = `
+                    <p>❌ Error loading data: ${error.message}</p>
+                    <p>Make sure your SvelteKit server is running on <code>http://localhost:5173</code></p>
+                `;
+            }
+        }
+        
+        function displayData(data) {
+            const brands = data.guidelines;
+            
+            // Show stats
+            const statsHtml = `
+                <div class="stat-card">
+                    <div class="stat-number">${brands.length}</div>
+                    <div class="stat-label">Total Brands</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${brands.filter(b => b.sourceFile && b.sourceFile.includes('.pdf')).length}</div>
+                    <div class="stat-label">PDF Uploads</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${brands.filter(b => b.isActive).length}</div>
+                    <div class="stat-label">Active Brands</div>
+                </div>
+            `;
+            document.getElementById('stats').innerHTML = statsHtml;
+            
+            // Show brands
+            const brandsHtml = brands.map(brand => {
+                const colors = typeof brand.colors === 'string' ? JSON.parse(brand.colors) : brand.colors;
+                const typography = typeof brand.typography === 'string' ? JSON.parse(brand.typography) : brand.typography;
+                const logo = typeof brand.logo === 'string' ? JSON.parse(brand.logo) : brand.logo;
+                const tone = typeof brand.tone === 'string' ? JSON.parse(brand.tone) : brand.tone;
+                
+                return `
+                    <div class="brand-card">
+                        <div class="brand-name">${brand.brandName}</div>
+                        <div class="brand-details">
+                            <strong>Company:</strong> ${brand.companyName || 'N/A'}<br>
+                            <strong>Industry:</strong> ${brand.industry || 'N/A'}<br>
+                            <strong>Source:</strong> ${brand.sourceFile || 'N/A'}<br>
+                            <strong>Created:</strong> ${new Date(brand.createdAt).toLocaleString()}<br>
+                            <strong>Status:</strong> ${brand.isActive ? '✅ Active' : '❌ Inactive'}
+                        </div>
+                        
+                        <div class="json-section">
+                            <div class="json-title">🎨 Colors</div>
+                            <div class="json-content">${JSON.stringify(colors, null, 2)}</div>
+                        </div>
+                        
+                        <div class="json-section">
+                            <div class="json-title">🔤 Typography</div>
+                            <div class="json-content">${JSON.stringify(typography, null, 2)}</div>
+                        </div>
+                        
+                        <div class="json-section">
+                            <div class="json-title">🏷️ Logo</div>
+                            <div class="json-content">${JSON.stringify(logo, null, 2)}</div>
+                        </div>
+                        
+                        <div class="json-section">
+                            <div class="json-title">🗣️ Tone</div>
+                            <div class="json-content">${JSON.stringify(tone, null, 2)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('brands').innerHTML = brandsHtml;
+            
+            // Hide loading, show content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+        
+        // Load data when page loads
+        loadDatabaseData();
+    </script>
+</body>
+</html>
