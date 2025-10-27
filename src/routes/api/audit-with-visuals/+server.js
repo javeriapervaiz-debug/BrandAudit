@@ -2,8 +2,8 @@ import { json } from '@sveltejs/kit';
 import { VisualAuditScraper } from '$lib/services/web-scraping/visualAuditScraper.js';
 import { ScreenshotAnnotator } from '$lib/services/web-scraping/screenshotAnnotator.js';
 import { enhancedComplianceAnalyzer } from '$lib/services/audit/enhancedComplianceAnalyzer.js';
-import { BrandGuidelineRepository } from '$lib/repositories/brandGuidelineRepository.js';
-import { ScrapedDataRepository } from '$lib/repositories/scrapedDataRepository.js';
+import { BrandGuidelineRepository } from '$lib/repositories/brandGuidelineRepository.mock.js';
+import { ScrapedDataRepository } from '$lib/repositories/scrapedDataRepository.mock.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -24,7 +24,19 @@ export async function POST({ request }) {
     const brandGuidelines = await brandRepo.findById(brandId);
     
     if (!brandGuidelines) {
-      return json({ error: 'Brand guidelines not found' }, { status: 404 });
+      console.log(`❌ Brand guidelines not found for ID: ${brandId}`);
+      
+      // Try to get all guidelines to see what's available
+      const allGuidelines = brandRepo.getAllGuidelines();
+      console.log(`📊 Available guidelines in memory:`, allGuidelines.map(g => ({ id: g.id, brandName: g.brandName })));
+      
+      return json({ 
+        error: 'Brand guidelines not found',
+        debug: {
+          requestedId: brandId,
+          availableGuidelines: allGuidelines.map(g => ({ id: g.id, brandName: g.brandName }))
+        }
+      }, { status: 404 });
     }
     
     // Scrape with visual data
@@ -72,44 +84,92 @@ export async function POST({ request }) {
       brandGuidelines
     );
     
-    // Annotate screenshot (if available)
-    let annotatedScreenshot = null;
+    // Create targeted audit report with enhanced annotations
+    let visualReport = null;
     if (scrapedData.visualData?.screenshot) {
       try {
-        console.log(`🎨 Annotating screenshot...`);
-        annotatedScreenshot = await screenshotAnnotator.annotateScreenshot(
-          scrapedData.visualData.screenshot,
-          auditResults,
-          scrapedData.visualData.elementPositions
-        );
+        console.log(`🎯 Creating targeted visual audit report...`);
+        visualReport = await visualScraper.createTargetedAuditReport(url, auditResults);
       } catch (annotationError) {
-        console.warn('⚠️ Screenshot annotation failed:', annotationError);
-        // Continue without annotation
+        console.warn('⚠️ Targeted annotation failed, falling back to standard annotation:', annotationError);
+        // Fallback to standard annotation
+        try {
+          console.log(`🎨 Annotating screenshot with standard method...`);
+          const annotatedScreenshot = await screenshotAnnotator.annotateScreenshot(
+            scrapedData.visualData.screenshot,
+            auditResults,
+            scrapedData.visualData.elementPositions
+          );
+          visualReport = {
+            ...auditResults,
+            visualData: {
+              ...scrapedData.visualData,
+              annotatedScreenshot
+            }
+          };
+        } catch (fallbackError) {
+          console.warn('⚠️ Standard annotation also failed:', fallbackError);
+          visualReport = {
+            ...auditResults,
+            visualData: scrapedData.visualData
+          };
+        }
       }
     } else {
       console.warn('⚠️ No screenshot available for annotation');
     }
     
-    // Convert screenshot to base64 for frontend (if available)
+    // Use visual report if available, otherwise use basic audit results
+    const finalReport = visualReport || {
+      ...auditResults,
+      visualData: scrapedData.visualData
+    };
+    
+    // Convert screenshots to base64 for frontend (if available)
     let screenshotDataUrl = null;
-    if (annotatedScreenshot && fs.existsSync(annotatedScreenshot)) {
+    let targetedScreenshotDataUrl = null;
+    
+    if (finalReport.visualData?.screenshot) {
       try {
-        const screenshotBuffer = fs.readFileSync(annotatedScreenshot);
-        const screenshotBase64 = screenshotBuffer.toString('base64');
-        screenshotDataUrl = `data:image/png;base64,${screenshotBase64}`;
-      } catch (screenshotError) {
-        console.warn('⚠️ Failed to convert screenshot to base64:', screenshotError);
+        const screenshotBuffer = fs.readFileSync(finalReport.visualData.screenshot);
+        screenshotDataUrl = `data:image/png;base64,${screenshotBuffer.toString('base64')}`;
+      } catch (error) {
+        console.warn('⚠️ Failed to convert screenshot to base64:', error);
       }
     }
+    
+    if (finalReport.visualData?.annotatedScreenshot) {
+      try {
+        const annotatedBuffer = fs.readFileSync(finalReport.visualData.annotatedScreenshot);
+        targetedScreenshotDataUrl = `data:image/png;base64,${annotatedBuffer.toString('base64')}`;
+      } catch (error) {
+        console.warn('⚠️ Failed to convert targeted screenshot to base64:', error);
+      }
+    }
+    
+    // Attach element positions to specific issues
+    const issuesWithPositions = (auditResults.issues || []).map((issue, index) => {
+      const positions = finalReport.visualData?.elementPositions || [];
+      // Only attach positions that might be relevant to this issue
+      // For now, we'll use a subset - the first few elements per issue
+      const startIndex = index * 3; // 3 elements per issue
+      const endIndex = startIndex + 1; // Just 1 element per issue to avoid overflow
+      const relevantPositions = positions.slice(startIndex, endIndex);
+      
+      return {
+        ...issue,
+        elementPositions: relevantPositions
+      };
+    });
     
     // Store scraped data with visual information
     const scrapedDataWithVisuals = {
       ...scrapedData,
       screenshot: screenshotDataUrl,
-      annotatedScreenshot: screenshotDataUrl,
-      elementPositions: scrapedData.visualData?.elementPositions || [],
-      viewport: scrapedData.visualData?.viewport || { width: 1920, height: 1080 },
-      timestamp: scrapedData.visualData?.timestamp || new Date().toISOString()
+      annotatedScreenshot: targetedScreenshotDataUrl || screenshotDataUrl,
+      elementPositions: finalReport.visualData?.elementPositions || [],
+      viewport: finalReport.visualData?.viewport || { width: 1920, height: 1080 },
+      timestamp: finalReport.visualData?.timestamp || new Date().toISOString()
     };
     
     // Save to database
@@ -117,11 +177,11 @@ export async function POST({ request }) {
     
     // Clean up temporary files
     try {
-      if (scrapedData.visualData?.screenshot && fs.existsSync(scrapedData.visualData.screenshot)) {
-        fs.unlinkSync(scrapedData.visualData.screenshot);
+      if (finalReport.visualData?.screenshot && fs.existsSync(finalReport.visualData.screenshot)) {
+        fs.unlinkSync(finalReport.visualData.screenshot);
       }
-      if (annotatedScreenshot && fs.existsSync(annotatedScreenshot)) {
-        fs.unlinkSync(annotatedScreenshot);
+      if (finalReport.visualData?.annotatedScreenshot && fs.existsSync(finalReport.visualData.annotatedScreenshot)) {
+        fs.unlinkSync(finalReport.visualData.annotatedScreenshot);
       }
     } catch (cleanupError) {
       console.warn('⚠️ Cleanup failed:', cleanupError);
@@ -132,7 +192,7 @@ export async function POST({ request }) {
       // Spread audit results
       overallScore: auditResults.overallScore,
       categoryScores: auditResults.categoryScores,
-      issues: auditResults.issues,
+      issues: issuesWithPositions, // Use issues with attached positions
       recommendations: auditResults.recommendations,
       summary: auditResults.summary,
       confidence: auditResults.confidence,
@@ -140,10 +200,12 @@ export async function POST({ request }) {
       skippedCategories: auditResults.skippedCategories,
       // Add visual data
       visualData: {
-        annotatedScreenshot: screenshotDataUrl,
-        elementPositions: scrapedData.visualData?.elementPositions || [],
-        viewport: scrapedData.visualData?.viewport || { width: 1920, height: 1080 },
-        timestamp: scrapedData.visualData?.timestamp || new Date().toISOString()
+        screenshot: screenshotDataUrl,
+        targetedScreenshot: targetedScreenshotDataUrl,
+        annotatedScreenshot: targetedScreenshotDataUrl || screenshotDataUrl, // For backward compatibility
+        elementPositions: finalReport.visualData?.elementPositions || [],
+        viewport: finalReport.visualData?.viewport || { width: 1920, height: 1080 },
+        timestamp: finalReport.visualData?.timestamp || new Date().toISOString()
       },
       interactive: true,
       scrapedDataId: savedData.id

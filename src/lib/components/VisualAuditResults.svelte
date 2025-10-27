@@ -1,7 +1,8 @@
 <script lang="ts">
   import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
   import { Button } from '$lib/components/ui/button';
-  import { AlertTriangle, CheckCircle, XCircle, Info, ExternalLink, Copy, Check, ChevronDown, ChevronRight, Eye, EyeOff } from 'lucide-svelte';
+  import { AlertTriangle, CheckCircle, XCircle, Info, ExternalLink, Copy, Check, ChevronDown, ChevronRight, Eye, EyeOff, Maximize2 } from 'lucide-svelte';
+  import FullscreenScreenshotModal from './FullscreenScreenshotModal.svelte';
 
   export let auditData;
   export let websiteUrl;
@@ -13,6 +14,7 @@
   let showAllHighlights = true;
   let copiedItems: Set<string> = new Set();
   let expandedSections: Set<string> = new Set();
+  let showFullscreenModal = false;
 
   // Copy functionality
   async function copyToClipboard(text: string, itemId: string) {
@@ -36,6 +38,14 @@
 
   function selectIssue(issue: any) {
     selectedIssue = selectedIssue === issue ? null : issue;
+  }
+
+  function openFullscreenModal() {
+    showFullscreenModal = true;
+  }
+
+  function closeFullscreenModal() {
+    showFullscreenModal = false;
   }
 
   function getIssueCoordinates(issue: any) {
@@ -152,18 +162,28 @@
               />
               
               <!-- Interactive highlights overlay -->
-              {#if showAllHighlights && visualData.elementPositions}
+              {#if showAllHighlights && visualData.elementPositions && visualData.elementPositions.length > 0}
                 <div class="highlights-overlay">
-                  {#each auditData?.issues || [] as issue, index}
-                    <div
-                      class="issue-highlight {issue.category} {issue.severity}"
-                      style={getHighlightStyle(issue)}
-                      onclick={() => selectIssue(issue)}
-                      role="button"
-                      tabindex="0"
-                    >
-                      <div class="issue-marker">{index + 1}</div>
-                    </div>
+                  {#each visualData.elementPositions as elementPos, index}
+                    {@const issue = auditData?.issues?.[index]}
+                    {#if issue}
+                      <div
+                        class="issue-highlight {issue.category} {issue.severity}"
+                        style="
+                          {getHighlightStyle(issue).borderColor ? `border-color: ${getHighlightStyle(issue).borderColor};` : ''}
+                          {getHighlightStyle(issue).borderWidth ? `border-width: ${getHighlightStyle(issue).borderWidth};` : ''}
+                          left: {elementPos?.position?.x || 0}px;
+                          top: {elementPos?.position?.y || 0}px;
+                          width: {elementPos?.position?.width || 100}px;
+                          height: {elementPos?.position?.height || 50}px;
+                        "
+                        onclick={() => selectIssue(issue)}
+                        role="button"
+                        tabindex="0"
+                      >
+                        <div class="issue-marker">{index + 1}</div>
+                      </div>
+                    {/if}
                   {/each}
                 </div>
               {/if}
@@ -179,6 +199,16 @@
                 />
                 <span class="text-sm text-gray-600">Show Issue Highlights</span>
               </label>
+              <Button
+                variant="outline"
+                size="sm"
+                onclick={openFullscreenModal}
+                class="flex items-center gap-2"
+                type="button"
+              >
+                <Maximize2 class="w-4 h-4" />
+                Fullscreen
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -236,16 +266,6 @@
                         {#if issue.suggestion}
                           <div class="issue-suggestion">{issue.suggestion}</div>
                         {/if}
-                        {#if issue.fixSnippet}
-                          <div class="issue-fix">
-                            <button
-                              class="text-xs text-blue-600 hover:text-blue-800"
-                              onclick={() => copyToClipboard(issue.fixSnippet, `fix-${index}`)}
-                            >
-                              {copiedItems.has(`fix-${index}`) ? 'Copied!' : 'Copy Fix'}
-                            </button>
-                          </div>
-                        {/if}
                       </div>
                     {/each}
                   </div>
@@ -281,21 +301,6 @@
             <div>
               <h4 class="font-medium text-gray-900 mb-2">Recommendation</h4>
               <p class="text-gray-700">{selectedIssue.suggestion}</p>
-            </div>
-          {/if}
-          
-          {#if selectedIssue.fixSnippet}
-            <div>
-              <h4 class="font-medium text-gray-900 mb-2">Code Fix</h4>
-              <div class="bg-gray-100 p-3 rounded-lg">
-                <pre class="text-sm text-gray-800">{selectedIssue.fixSnippet}</pre>
-                <button
-                  class="mt-2 text-sm text-blue-600 hover:text-blue-800"
-                  onclick={() => copyToClipboard(selectedIssue.fixSnippet, 'modal-fix')}
-                >
-                  {copiedItems.has('modal-fix') ? 'Copied!' : 'Copy Code'}
-                </button>
-              </div>
             </div>
           {/if}
           
@@ -463,3 +468,14 @@
     font-style: italic;
   }
 </style>
+
+<!-- Fullscreen Screenshot Modal -->
+<FullscreenScreenshotModal
+  bind:isOpen={showFullscreenModal}
+  screenshot={visualData?.originalScreenshot}
+  annotatedScreenshot={visualData?.annotatedScreenshot}
+  showHighlights={showAllHighlights}
+  issues={auditData?.issues || []}
+  elementPositions={visualData?.elementPositions || []}
+  on:close={closeFullscreenModal}
+/>

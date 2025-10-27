@@ -1,7 +1,8 @@
 <script lang="ts">
   import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
   import { Button } from '$lib/components/ui/button';
-  import { AlertTriangle, CheckCircle, XCircle, Info, ExternalLink, Copy, Check, ChevronDown, ChevronRight } from 'lucide-svelte';
+  import { AlertTriangle, CheckCircle, XCircle, Info, ExternalLink, Copy, Check, ChevronDown, ChevronRight, Maximize2 } from 'lucide-svelte';
+  import FullscreenScreenshotModal from './FullscreenScreenshotModal.svelte';
 
   export let auditData: any;
   export let websiteUrl: string;
@@ -17,6 +18,8 @@
   let selectedIssue: any = null;
   let showAllHighlights = true;
   let showVisualAudit = false;
+  let showFullscreenModal = false;
+
 
   async function copyToClipboard(text: string, itemId: string) {
     try {
@@ -40,6 +43,14 @@
   // Visual audit functions
   function selectIssue(issue: any) {
     selectedIssue = selectedIssue === issue ? null : issue;
+  }
+
+  function openFullscreenModal() {
+    showFullscreenModal = true;
+  }
+
+  function closeFullscreenModal() {
+    showFullscreenModal = false;
   }
 
   function getHighlightStyle(issue: any) {
@@ -80,8 +91,7 @@
           element: issue.element || 'general',
           severity: issue.severity || 'medium',
           issues: [],
-          elements: new Set(),
-          fixSnippet: ''
+          elements: new Set()
         };
       }
       grouped[key].issues.push(issue);
@@ -90,42 +100,12 @@
       }
     });
 
-    // Generate fix snippets for each group
+    // Clean up elements
     Object.values(grouped).forEach((group: any) => {
       group.elements = Array.from(group.elements);
-      group.fixSnippet = generateGroupFixSnippet(group);
     });
 
     return grouped;
-  }
-
-  function generateGroupFixSnippet(group: any): string {
-    const selectors = group.elements.join(', ');
-    const properties = new Map();
-    
-    group.issues.forEach((issue: any) => {
-      if (issue.cssFix && issue.cssFix.css) {
-        // Use LLM-generated CSS if available
-        return issue.cssFix.css;
-      }
-      
-      const prop = issue.cssProperty || issue.property;
-      const value = issue.expected || issue.correctValue;
-      
-      if (prop && value) {
-        properties.set(prop, value);
-      }
-    });
-
-    if (properties.size === 0) {
-      return `${selectors} {\n  /* No specific fixes available */\n}`;
-    }
-
-    const cssProps = Array.from(properties.entries())
-      .map(([prop, value]) => `  ${prop}: ${value};`)
-      .join('\n');
-
-    return `${selectors} {\n${cssProps}\n}`;
   }
 
   // Get severity color
@@ -238,6 +218,16 @@
                 />
                 <span>Show Highlights</span>
               </label>
+              <Button
+                variant="outline"
+                size="sm"
+                onclick={openFullscreenModal}
+                class="flex items-center gap-2"
+                type="button"
+              >
+                <Maximize2 class="w-4 h-4" />
+                Fullscreen
+              </Button>
             </div>
           {/if}
         </div>
@@ -252,17 +242,28 @@
           />
           
           <!-- Interactive highlights overlay for visual audit -->
-          {#if visualData?.annotatedScreenshot && showAllHighlights && visualData.elementPositions && visualData.elementPositions.length > 0}
+          {#if visualData?.annotatedScreenshot && showAllHighlights}
             <div class="highlights-overlay">
               {#each auditData?.issues || [] as issue, index}
-                <button
-                  class="issue-highlight {issue.category} {issue.severity}"
-                  style="border-color: {getHighlightStyle(issue).borderColor}; border-width: {getHighlightStyle(issue).borderWidth};"
-                  onclick={() => selectIssue(issue)}
-                  type="button"
-                >
-                  <div class="issue-marker">{index + 1}</div>
-                </button>
+                {#if issue.elementPositions && issue.elementPositions.length > 0}
+                  {#each issue.elementPositions as elementPos, posIndex}
+                    <button
+                      class="issue-highlight {issue.category} {issue.severity}"
+                      style="
+                        border-color: {getHighlightStyle(issue).borderColor}; 
+                        border-width: {getHighlightStyle(issue).borderWidth};
+                        left: {elementPos?.position?.x || 0}px;
+                        top: {elementPos?.position?.y || 0}px;
+                        width: {elementPos?.position?.width || 100}px;
+                        height: {elementPos?.position?.height || 50}px;
+                      "
+                      onclick={() => selectIssue(issue)}
+                      type="button"
+                    >
+                      <div class="issue-marker">{index + 1}</div>
+                    </button>
+                  {/each}
+                {/if}
               {/each}
             </div>
           {:else if visualData?.annotatedScreenshot}
@@ -422,28 +423,6 @@
                     </div>
                   {/each}
                 </div>
-
-                <!-- Fix Snippet -->
-                <div class="bg-gray-900 rounded-lg p-4">
-                  <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-medium text-gray-300">Fix Code</span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      class="bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
-                      onclick={() => copyToClipboard(group.fixSnippet, `fix-${sectionId}`)}
-                    >
-                      {#if copiedItems.has(`fix-${sectionId}`)}
-                        <Check class="h-3 w-3 mr-1" />
-                        Copied!
-                      {:else}
-                        <Copy class="h-3 w-3 mr-1" />
-                        Copy
-                      {/if}
-                    </Button>
-                  </div>
-                  <pre class="text-green-400 text-sm overflow-x-auto"><code>{group.fixSnippet}</code></pre>
-                </div>
               </div>
             {/if}
           </div>
@@ -476,7 +455,7 @@
           {#each auditData.recommendations as recommendation}
             <li class="flex items-start space-x-2">
               <CheckCircle class="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
-              <span class="text-gray-700">{recommendation}</span>
+              <span class="text-gray-700">{recommendation.message || recommendation.action || recommendation.title || recommendation}</span>
             </li>
           {/each}
         </ul>
@@ -510,21 +489,6 @@
             </div>
           {/if}
           
-          {#if selectedIssue.fixSnippet}
-            <div>
-              <h4 class="font-medium text-gray-900 mb-2">Code Fix</h4>
-              <div class="bg-gray-100 p-3 rounded-lg">
-                <pre class="text-sm text-gray-800">{selectedIssue.fixSnippet}</pre>
-                <button
-                  class="mt-2 text-sm text-blue-600 hover:text-blue-800"
-                  onclick={() => copyToClipboard(selectedIssue.fixSnippet, 'modal-fix')}
-                >
-                  {copiedItems.has('modal-fix') ? 'Copied!' : 'Copy Code'}
-                </button>
-              </div>
-            </div>
-          {/if}
-          
           <div class="flex items-center gap-4">
             <div>
               <span class="text-sm text-gray-500">Severity:</span>
@@ -547,6 +511,17 @@
       </Card>
     </div>
   {/if}
+
+  <!-- Fullscreen Screenshot Modal -->
+  <FullscreenScreenshotModal
+    isOpen={showFullscreenModal}
+    screenshot={screenshot}
+    annotatedScreenshot={visualData?.annotatedScreenshot}
+    showHighlights={showAllHighlights}
+    issues={auditData?.issues || []}
+    elementPositions={visualData?.elementPositions || []}
+    on:close={closeFullscreenModal}
+  />
 </div>
 
 <style>
