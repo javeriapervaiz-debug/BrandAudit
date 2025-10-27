@@ -1,7 +1,9 @@
 import { json } from '@sveltejs/kit';
 import { VisualAuditScraper } from '$lib/services/web-scraping/visualAuditScraper.js';
 import { ScreenshotAnnotator } from '$lib/services/web-scraping/screenshotAnnotator.js';
+import { FixedScreenshotAnnotator } from '$lib/services/web-scraping/fixedScreenshotAnnotator.js';
 import { enhancedComplianceAnalyzer } from '$lib/services/audit/enhancedComplianceAnalyzer.js';
+import { SolutionLLMProcessor } from '$lib/services/audit/solutionLLMProcessor.js';
 import { BrandGuidelineRepository } from '$lib/repositories/brandGuidelineRepository.js';
 import { ScrapedDataRepository } from '$lib/repositories/scrapedDataRepository.js';
 import fs from 'fs';
@@ -84,12 +86,48 @@ export async function POST({ request }) {
       brandGuidelines
     );
     
+    // Process recommendations with LLM for actionable solutions
+    console.log(`🛠️ Processing recommendations with LLM...`);
+    let enhancedRecommendations = auditResults.recommendations || [];
+    try {
+      const solutionProcessor = new SolutionLLMProcessor();
+      const solutionResults = await solutionProcessor.processIssues(
+        auditResults.issues || [],
+        brandGuidelines,
+        analysisData
+      );
+      
+      // Merge LLM-generated solutions with existing recommendations
+      if (solutionResults.solutions && solutionResults.solutions.length > 0) {
+        enhancedRecommendations = [
+          ...enhancedRecommendations,
+          ...solutionResults.solutions
+        ];
+        console.log(`✅ Enhanced recommendations with ${solutionResults.solutions.length} actionable solutions`);
+      }
+    } catch (solutionError) {
+      console.warn('⚠️ LLM solution processing failed, using default recommendations:', solutionError);
+      // Continue with default recommendations if LLM fails
+    }
+    
     // Create targeted audit report with enhanced annotations
     let visualReport = null;
     if (scrapedData.visualData?.screenshot) {
       try {
         console.log(`🎯 Creating targeted visual audit report...`);
-        visualReport = await visualScraper.createTargetedAuditReport(url, auditResults);
+        const fixedAnnotator = new FixedScreenshotAnnotator();
+        const annotatedScreenshot = await fixedAnnotator.createTargetedAnnotations(
+          scrapedData.visualData.screenshot,
+          auditResults,
+          scrapedData.visualData.elementPositions
+        );
+        visualReport = {
+          ...auditResults,
+          visualData: {
+            ...scrapedData.visualData,
+            annotatedScreenshot
+          }
+        };
       } catch (annotationError) {
         console.warn('⚠️ Targeted annotation failed, falling back to standard annotation:', annotationError);
         // Fallback to standard annotation
@@ -193,7 +231,7 @@ export async function POST({ request }) {
       overallScore: auditResults.overallScore,
       categoryScores: auditResults.categoryScores,
       issues: issuesWithPositions, // Use issues with attached positions
-      recommendations: auditResults.recommendations,
+      recommendations: enhancedRecommendations, // Use enhanced recommendations with LLM solutions
       summary: auditResults.summary,
       confidence: auditResults.confidence,
       detailedSummary: auditResults.detailedSummary,
