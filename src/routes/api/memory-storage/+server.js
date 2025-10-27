@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { BrandGuidelineRepository } from '$lib/repositories/brandGuidelineRepository.mock.js';
+import { BrandGuidelineRepository } from '$lib/repositories/brandGuidelineRepository.js';
 
 const guidelineRepo = new BrandGuidelineRepository();
 
@@ -15,9 +15,9 @@ export async function GET({ url }) {
 
     switch (action) {
       case 'list':
-        // List all guidelines in memory
-        const allGuidelines = guidelineRepo.getAllGuidelines();
-        const activeGuidelines = allGuidelines.filter(g => g.isActive);
+        // List all guidelines in database
+        const allGuidelines = await guidelineRepo.findAll();
+        const activeGuidelines = allGuidelines;
         
         return json({
           success: true,
@@ -68,12 +68,11 @@ export async function GET({ url }) {
         });
 
       case 'clear':
-        // Clear all guidelines (for testing)
-        guidelineRepo.clear();
+        // Note: Clear operation is not supported in PostgreSQL
         return json({
-          success: true,
-          message: 'All guidelines cleared from memory'
-        });
+          success: false,
+          error: 'Clear operation is not supported in PostgreSQL. Use database management tools instead.'
+        }, { status: 400 });
 
       default:
         return json({

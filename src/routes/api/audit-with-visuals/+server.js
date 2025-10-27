@@ -2,8 +2,8 @@ import { json } from '@sveltejs/kit';
 import { VisualAuditScraper } from '$lib/services/web-scraping/visualAuditScraper.js';
 import { ScreenshotAnnotator } from '$lib/services/web-scraping/screenshotAnnotator.js';
 import { enhancedComplianceAnalyzer } from '$lib/services/audit/enhancedComplianceAnalyzer.js';
-import { BrandGuidelineRepository } from '$lib/repositories/brandGuidelineRepository.mock.js';
-import { ScrapedDataRepository } from '$lib/repositories/scrapedDataRepository.mock.js';
+import { BrandGuidelineRepository } from '$lib/repositories/brandGuidelineRepository.js';
+import { ScrapedDataRepository } from '$lib/repositories/scrapedDataRepository.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -27,8 +27,8 @@ export async function POST({ request }) {
       console.log(`❌ Brand guidelines not found for ID: ${brandId}`);
       
       // Try to get all guidelines to see what's available
-      const allGuidelines = brandRepo.getAllGuidelines();
-      console.log(`📊 Available guidelines in memory:`, allGuidelines.map(g => ({ id: g.id, brandName: g.brandName })));
+      const allGuidelines = await brandRepo.findAll();
+      console.log(`📊 Available guidelines in database:`, allGuidelines.map(g => ({ id: g.id, brandName: g.brandName })));
       
       return json({ 
         error: 'Brand guidelines not found',
