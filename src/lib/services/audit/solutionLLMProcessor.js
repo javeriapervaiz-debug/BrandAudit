@@ -39,7 +39,8 @@ export class SolutionLLMProcessor {
         console.log(`✅ Generated ${solutions.length} actionable solutions`);
         return solutions;
       } else {
-        throw new Error('Invalid solutions format from LLM');
+        console.warn('⚠️ LLM returned empty or invalid solutions, using fallback');
+        return this.fallbackGenerateSolutions(issues, brandGuidelines);
       }
       
     } catch (error) {
@@ -209,28 +210,58 @@ Return ONLY the JSON array, no other text.
   }
 
   /**
-   * JSON parsing with error handling
+   * JSON parsing with error handling and repair
    */
   parseLLMResponse(text) {
     try {
       let cleanText = text.trim()
         .replace(/```json\s*/g, '')
-        .replace(/\s*```/g, '');
+        .replace(/\s*```/g, '')
+        .replace(/```/g, ''); // Remove any remaining markdown
       
       const jsonStart = cleanText.indexOf('[');
       const jsonEnd = cleanText.lastIndexOf(']') + 1;
       
       if (jsonStart === -1 || jsonEnd === 0) {
-        throw new Error('No JSON array found');
+        console.error('❌ No JSON array found in response');
+        return []; // Return empty array instead of throwing
       }
       
       cleanText = cleanText.substring(jsonStart, jsonEnd);
-      return JSON.parse(cleanText);
+      
+      // Try to fix common JSON issues
+      cleanText = this.repairJson(cleanText);
+      
+      const parsed = JSON.parse(cleanText);
+      return Array.isArray(parsed) ? parsed : [];
       
     } catch (error) {
-      console.error('❌ JSON parsing failed:', error);
-      throw error;
+      console.error('❌ JSON parsing failed after repair:', error.message);
+      console.error('📄 Failed text snippet:', text.substring(0, 200));
+      return []; // Return empty array instead of throwing
     }
+  }
+
+  /**
+   * Repair common JSON issues
+   */
+  repairJson(jsonText) {
+    let repaired = jsonText;
+    
+    // Fix trailing commas
+    repaired = repaired.replace(/,(\s*[}\]])/g, '$1');
+    
+    // Fix missing commas between properties (basic attempt)
+    repaired = repaired.replace(/}([\s\n]*){/g, '},{');
+    
+    // Fix unclosed strings
+    repaired = repaired.replace(/:\s*"([^"]*?)([\r\n]+)([^"]*?)"/g, ':"$1 $3"');
+    
+    // Remove comments
+    repaired = repaired.replace(/\/\/.*$/gm, '');
+    repaired = repaired.replace(/\/\*[\s\S]*?\*\//g, '');
+    
+    return repaired;
   }
 
   /**

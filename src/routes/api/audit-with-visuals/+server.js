@@ -167,22 +167,37 @@ export async function POST({ request }) {
     let screenshotDataUrl = null;
     let targetedScreenshotDataUrl = null;
     
-    if (finalReport.visualData?.screenshot) {
+    // Check and convert original screenshot
+    if (finalReport.visualData?.screenshot && fs.existsSync(finalReport.visualData.screenshot)) {
       try {
         const screenshotBuffer = fs.readFileSync(finalReport.visualData.screenshot);
         screenshotDataUrl = `data:image/png;base64,${screenshotBuffer.toString('base64')}`;
+        console.log(`✅ Converted original screenshot to base64`);
       } catch (error) {
         console.warn('⚠️ Failed to convert screenshot to base64:', error);
       }
+    } else {
+      console.warn('⚠️ Screenshot file does not exist:', finalReport.visualData?.screenshot);
     }
     
-    if (finalReport.visualData?.annotatedScreenshot) {
+    // Check and convert annotated screenshot
+    if (finalReport.visualData?.annotatedScreenshot && fs.existsSync(finalReport.visualData.annotatedScreenshot)) {
       try {
         const annotatedBuffer = fs.readFileSync(finalReport.visualData.annotatedScreenshot);
         targetedScreenshotDataUrl = `data:image/png;base64,${annotatedBuffer.toString('base64')}`;
+        console.log(`✅ Converted annotated screenshot to base64`);
       } catch (error) {
         console.warn('⚠️ Failed to convert targeted screenshot to base64:', error);
+        // Fallback to original screenshot if annotated one fails
+        if (screenshotDataUrl) {
+          targetedScreenshotDataUrl = screenshotDataUrl;
+          console.log(`✅ Using original screenshot as fallback`);
+        }
       }
+    } else if (screenshotDataUrl) {
+      // If no annotated screenshot but we have original, use it
+      targetedScreenshotDataUrl = screenshotDataUrl;
+      console.log(`✅ Using original screenshot as annotated screenshot`);
     }
     
     // Attach element positions to specific issues
@@ -240,7 +255,7 @@ export async function POST({ request }) {
       visualData: {
         screenshot: screenshotDataUrl,
         targetedScreenshot: targetedScreenshotDataUrl,
-        annotatedScreenshot: targetedScreenshotDataUrl || screenshotDataUrl, // For backward compatibility
+        annotatedScreenshot: targetedScreenshotDataUrl || screenshotDataUrl || null, // For backward compatibility
         elementPositions: finalReport.visualData?.elementPositions || [],
         viewport: finalReport.visualData?.viewport || { width: 1920, height: 1080 },
         timestamp: finalReport.visualData?.timestamp || new Date().toISOString()
